@@ -1,0 +1,19 @@
+{
+  "name": "Hardware Diagnostic Suite",
+  "short_name": "Hardware Suite",
+  "description": "Browser-based hardware diagnostics for desktop and mobile devices.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#0b0d13",
+  "theme_color": "#0b0d13",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
