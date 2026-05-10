@@ -177,7 +177,7 @@ export default function WebcamTester() {
             <style>{`
         .webcam-container {
           position: relative; width: 100%; aspect-ratio: 16/9;
-          background: linear-gradient(135deg, var(--surface-1), var(--bg));
+          background: var(--surface-panel);
           border-radius: var(--radius); overflow: hidden; display: flex; align-items: center;
           justify-content: center; border: 1px solid var(--border);
         }

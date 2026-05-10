@@ -83,11 +83,11 @@ export default function MouseTester() {
         .mouse-test-area {
           display: flex; justify-content: center; align-items: center;
           min-height: 240px; cursor: crosshair; user-select: none;
-          background: linear-gradient(135deg, var(--surface-1), var(--surface-2));
+          background: var(--surface-panel);
           border-radius: var(--radius); border: 1px solid var(--border);
           transition: border-color var(--transition);
         }
-        .mouse-test-area:hover { border-color: rgba(59, 130, 246, 0.3); }
+        .mouse-test-area:hover { border-color: var(--surface-accent-border); }
         .mouse-diagram { display: flex; justify-content: center; align-items: center; }
         .mouse-body {
           width: 110px; height: 180px;
@@ -108,7 +108,7 @@ export default function MouseTester() {
         .mouse-btn-vis.right { right: 0; top: 0; border-radius: 0 55px 0 0; }
         .mouse-btn-vis.active {
           background: var(--primary);
-          box-shadow: inset 0 0 20px rgba(59, 130, 246, 0.4);
+          box-shadow: inset 0 0 20px var(--primary-glow);
         }
         .mouse-scroll-vis {
           position: absolute; top: 35px; left: 50%; transform: translateX(-50%);

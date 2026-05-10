@@ -216,18 +216,17 @@ export default function MidiTester() {
         .piano-key.active.black { background: var(--primary-hover); box-shadow: 0 0 12px var(--primary-glow); }
 
         .midi-log { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; overflow: hidden; }
-        .midi-log h4 { color: var(--text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+        .midi-log h4 { color: var(--text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0; margin-bottom: 0.5rem; }
         .midi-log__table { overflow-x: auto; }
         .midi-log__header, .midi-log__row {
           display: grid; grid-template-columns: 100px 40px 60px 40px 1fr;
           gap: 0.5rem; padding: 0.3rem 0; font-size: var(--text-xs); font-family: var(--font-mono);
         }
-        .midi-log__header { color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; margin-bottom: 0.25rem; }
+        .midi-log__header { color: var(--text-muted); text-transform: uppercase; letter-spacing: 0; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; margin-bottom: 0.25rem; }
         .midi-log__row { color: var(--text-muted); }
         .midi-log__row.on { color: var(--success); }
         .midi-log__row.off { color: var(--text-muted); opacity: 0.5; }
         .midi-log__row .raw { opacity: 0.4; }
-        .status-inline { color: var(--text-muted); font-size: var(--text-sm); font-family: var(--font-mono); }
       `}</style>
         </section>
     );

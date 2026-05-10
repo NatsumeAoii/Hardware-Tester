@@ -98,7 +98,7 @@ export default function CompatibilityMatrix() {
         .compatibility-score {
           min-width: 108px; min-height: 64px; padding: 0.65rem 0.8rem;
           border: 1px solid var(--border); border-radius: var(--radius-sm);
-          background: linear-gradient(135deg, var(--surface-2), var(--surface-1));
+          background: var(--surface-panel);
           display: flex; flex-direction: column; justify-content: center; align-items: flex-end;
         }
         .compatibility-score strong { font-size: 1.45rem; line-height: 1; color: var(--text); font-family: var(--font-mono); }
@@ -116,7 +116,7 @@ export default function CompatibilityMatrix() {
           border-radius: var(--radius-sm); background: var(--surface-1);
           display: flex; justify-content: space-between; align-items: center; gap: 1rem;
         }
-        .compatibility-stat span { color: var(--text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; }
+        .compatibility-stat span { color: var(--text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0; }
         .compatibility-stat strong { color: var(--text); font-size: var(--text-lg); font-family: var(--font-mono); }
         .compatibility-list {
           display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -130,7 +130,7 @@ export default function CompatibilityMatrix() {
           transition: border-color var(--transition), transform var(--transition), background var(--transition);
         }
         .compatibility-item:hover, .compatibility-item:focus-visible {
-          border-color: rgba(59,130,246,0.35); background: var(--surface-2); transform: translateY(-1px);
+          border-color: var(--primary-glow); background: var(--surface-2); transform: translateY(-1px);
         }
         .compatibility-item__main { min-width: 0; display: flex; flex-direction: column; gap: 0.12rem; }
         .compatibility-item__label { font-size: var(--text-sm); font-weight: 650; }
@@ -140,12 +140,12 @@ export default function CompatibilityMatrix() {
         }
         .compatibility-item__meta, .compatibility-item__status {
           border-radius: 999px; padding: 0.2rem 0.5rem; font-size: 10px;
-          text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap;
+          text-transform: uppercase; letter-spacing: 0; white-space: nowrap;
         }
         .compatibility-item__meta { color: var(--text-muted); background: var(--surface-2); }
         .compatibility-item__status { color: var(--text); border: 1px solid var(--border); }
         .compatibility-item.available .compatibility-item__status { color: var(--success); border-color: rgba(34,197,94,0.45); }
-        .compatibility-item.permission .compatibility-item__status { color: var(--primary); border-color: rgba(59,130,246,0.45); }
+        .compatibility-item.permission .compatibility-item__status { color: var(--primary); border-color: var(--primary-glow); }
         .compatibility-item.partial .compatibility-item__status { color: var(--warning); border-color: rgba(245,158,11,0.45); }
         .compatibility-item.blocked .compatibility-item__status,
         .compatibility-item.unsupported .compatibility-item__status { color: var(--text-muted); }

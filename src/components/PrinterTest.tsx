@@ -158,7 +158,7 @@ export default function PrinterTest() {
         .print-header h2 { color: #000; font-size: 1.5rem; margin-bottom: 0.25rem; }
         .print-header p { color: #666; font-size: 12px; }
         .print-section { margin-bottom: 1.5rem; break-inside: avoid; }
-        .print-section h3 { font-size: 14px; color: #000; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .print-section h3 { font-size: 14px; color: #000; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0; }
         .color-bars { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; }
         .color-bar { padding: 1rem 0.5rem; text-align: center; font-size: 11px; font-weight: 600; }
         .gray-gradient { display: flex; }

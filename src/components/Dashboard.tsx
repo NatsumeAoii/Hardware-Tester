@@ -65,22 +65,38 @@ export default function Dashboard() {
         ];
     }, [specs, battery, storage]);
 
+    const dashboardSummary = useMemo(() => [
+        { label: 'Tests', value: dashboardTesters.length.toString() },
+        { label: 'Device', value: specs.deviceType },
+        { label: 'Browser', value: specs.browser },
+        { label: 'Screen', value: specs.screenResolution },
+    ], [specs]);
+
     const year = new Date().getFullYear();
 
     return (
         <section className="dashboard">
-            <div className="dash-hero">
-                <div className="dash-hero__text">
-                    <h1>Hardware <span>Diagnostic Suite</span></h1>
-                    <p className="dash-hero__tagline">
-                        A comprehensive, browser-based toolkit for testing every piece of hardware on your device.
-                        Hardware and media checks run locally in your browser. Network diagnostics contact public test endpoints only when you run them.
-                    </p>
-                    <div className="dash-hero__actions">
-                        <a href="#keyboard" className="btn btn--primary">Start Testing</a>
-                        <a href="#report" className="btn dash-hero__secondary">Generate Report</a>
+            <div className="dash-overview">
+                <div className="dash-hero">
+                    <div className="dash-hero__text">
+                        <h1>Hardware <span>Diagnostic Suite</span></h1>
+                        <p className="dash-hero__tagline">
+                            Focused browser-based diagnostics for input, media, sensors, output, and system hardware.
+                        </p>
+                        <div className="dash-hero__actions">
+                            <a href="#keyboard" className="btn btn--primary">Start Testing</a>
+                            <a href="#report" className="btn dash-hero__secondary">Generate Report</a>
+                        </div>
                     </div>
                 </div>
+                <aside className="dash-summary" aria-label="Dashboard summary">
+                    {dashboardSummary.map(item => (
+                        <div key={item.label} className="dash-summary__item">
+                            <span className="dash-summary__label">{item.label}</span>
+                            <span className="dash-summary__value">{item.value}</span>
+                        </div>
+                    ))}
+                </aside>
             </div>
 
             <h2 className="dash-section-title">Device Specifications</h2>
@@ -145,19 +161,40 @@ export default function Dashboard() {
 
             <style>{`
         .dashboard { animation: fadeSlideIn 0.4s ease-out; }
-        .dash-hero {
-          padding: 2rem; border-radius: var(--radius);
-          background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(139,92,246,0.08));
-          border: 1px solid var(--border); margin-bottom: 2rem;
+        .dash-overview {
+          display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(240px, 0.75fr);
+          gap: 1rem; margin-bottom: 1.5rem; align-items: stretch;
         }
-        .dash-hero__text h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 0.75rem; }
-        .dash-hero__text h1 span { background: var(--accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .dash-hero__tagline { color: var(--text-muted); font-size: var(--text-sm); max-width: 70ch; line-height: 1.7; margin-bottom: 1.5rem; }
+        .dash-hero {
+          padding: 1.5rem; border-radius: var(--radius);
+          background: var(--surface-1); border: 1px solid var(--border); min-height: 100%;
+          display: flex; align-items: center;
+        }
+        .dash-hero__text h1 { font-size: clamp(1.75rem, 4vw, 2.35rem); font-weight: 800; letter-spacing: 0; line-height: 1.15; margin-bottom: 0.6rem; }
+        .dash-hero__text h1 span { color: var(--primary); }
+        .dash-hero__tagline { color: var(--text-muted); font-size: var(--text-sm); max-width: 60ch; line-height: 1.6; margin-bottom: 1.25rem; }
         .dash-hero__actions { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
         .dash-hero__secondary { background: var(--surface-1); border: 1px solid var(--border); }
+        .dash-summary {
+          display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+          padding: 1rem; border-radius: var(--radius); border: 1px solid var(--border);
+          background: var(--surface-1);
+        }
+        .dash-summary__item {
+          min-width: 0; padding: 0.85rem; border-radius: var(--radius-sm);
+          background: var(--surface-2); border: 1px solid var(--border);
+        }
+        .dash-summary__label {
+          display: block; color: var(--text-muted); font-size: var(--text-xs);
+          font-weight: 600; letter-spacing: 0; margin-bottom: 0.25rem;
+        }
+        .dash-summary__value {
+          display: block; color: var(--text); font-size: var(--text-sm); font-weight: 700;
+          overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
         .dash-section-title {
           font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;
-          letter-spacing: 0.1em; margin-bottom: 1rem; padding-bottom: 0.5rem;
+          letter-spacing: 0; margin-bottom: 1rem; padding-bottom: 0.5rem;
           border-bottom: 1px solid var(--border);
         }
         .dash-specs { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.5rem; margin-bottom: 2rem; }
@@ -166,10 +203,10 @@ export default function Dashboard() {
           background: var(--surface-1); border: 1px solid var(--border);
           border-radius: var(--radius-sm); padding: 0.75rem 1rem; transition: all var(--transition);
         }
-        .spec-card:hover { border-color: rgba(59,130,246,0.25); }
+        .spec-card:hover { border-color: var(--primary-glow); }
         .spec-card__svg { color: var(--text-muted); opacity: 0.5; flex-shrink: 0; }
         .spec-card__text { display: flex; flex-direction: column; min-width: 0; }
-        .spec-card__label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+        .spec-card__label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0; }
         .spec-card__value { font-size: var(--text-sm); font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .spec-note-badge { cursor: help; font-size: 10px; color: var(--primary); opacity: 0.7; margin-left: 2px; font-style: normal; }
         .dash-tech-stack { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2rem; }
@@ -178,29 +215,29 @@ export default function Dashboard() {
           background: var(--surface-2); border: 1px solid var(--border);
           border-radius: 999px; padding: 0.4rem 1rem; font-size: var(--text-sm); transition: all var(--transition);
         }
-        .tech-badge:hover { border-color: rgba(59,130,246,0.3); transform: translateY(-1px); }
+        .tech-badge:hover { border-color: var(--primary-glow); transform: translateY(-1px); }
         .tech-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
         .tech-name { font-weight: 600; color: var(--text); }
         .tech-version { color: var(--text-muted); font-family: var(--font-mono); font-size: var(--text-xs); }
         .dash-features { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.6rem; margin-bottom: 2rem; }
         .dash-feature {
-          background: linear-gradient(135deg, var(--surface-2), var(--surface-1));
+          background: var(--surface-1);
           border: 1px solid var(--border); border-radius: var(--radius);
           padding: 1rem; transition: all var(--transition); cursor: pointer;
           position: relative; overflow: hidden; color: var(--text); text-decoration: none;
         }
         .dash-feature::before {
           content: ''; position: absolute; inset: 0;
-          background: linear-gradient(135deg, rgba(59,130,246,0.04), transparent);
+          background: var(--primary-glow); opacity: 0.3;
           pointer-events: none;
         }
-        .dash-feature:hover, .dash-feature:focus-visible { border-color: rgba(59,130,246,0.3); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+        .dash-feature:hover, .dash-feature:focus-visible { border-color: var(--primary-glow); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
         .dash-feature__svg { color: var(--primary); opacity: 0.7; margin-bottom: 0.35rem; display: block; }
         .dash-feature h3 { font-size: var(--text-sm); font-weight: 600; margin-bottom: 0.15rem; }
         .dash-feature p { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
         .dash-info-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
         .dash-info-card {
-          background: linear-gradient(135deg, var(--surface-2), var(--surface-1));
+          background: var(--surface-1);
           border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem;
         }
         .dash-info-card h3 { font-size: var(--text-sm); font-weight: 600; margin-bottom: 0.5rem; color: var(--text); display: flex; align-items: center; gap: 0.5rem; }
@@ -208,7 +245,7 @@ export default function Dashboard() {
         .dash-info-card p { font-size: var(--text-xs); color: var(--text-muted); line-height: 1.6; }
         .dash-footer { text-align: center; color: var(--text-muted); font-size: var(--text-xs); opacity: 0.6; padding-top: 1rem; border-top: 1px solid var(--border); }
         .dash-footer p + p { margin-top: 0.25rem; }
-        @media (max-width: 768px) { .dash-hero__text h1 { font-size: 1.75rem; } }
+        @media (max-width: 900px) { .dash-overview { grid-template-columns: 1fr; } }
       `}</style>
         </section>
     );

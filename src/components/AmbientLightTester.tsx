@@ -175,7 +175,7 @@ export default function AmbientLightTester() {
         .als-help p { color: var(--text-muted); font-size: var(--text-xs); margin-top: 0.75rem; opacity: 0.7; }
         .als-hero {
           display: flex; align-items: center; gap: 1.5rem;
-          background: linear-gradient(135deg, var(--surface-2), var(--surface-1));
+          background: var(--surface-panel);
           border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem 2rem;
         }
         .als-hero__bar { width: 6px; height: 48px; border-radius: 3px; flex-shrink: 0; }

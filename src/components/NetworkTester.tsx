@@ -47,8 +47,8 @@ function SpeedGauge({ value, max, label, unit }: { value: number; max: number; l
                 <circle cx={cx} cy={cy} r="4" fill="var(--text)" />
                 <defs>
                     <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stopColor="#3b82f6" />
-                        <stop offset="100%" stopColor="#22c55e" />
+                        <stop offset="0%" stopColor="#14b8a6" />
+                        <stop offset="100%" stopColor="#84cc16" />
                     </linearGradient>
                 </defs>
             </svg>
@@ -442,11 +442,11 @@ export default function NetworkTester() {
         .net-config {
           display: flex; flex-direction: column; gap: 1rem;
           padding: 1rem; border-radius: var(--radius);
-          background: linear-gradient(135deg, var(--surface-2), var(--surface-1));
+          background: var(--surface-panel);
           border: 1px solid var(--border); margin-bottom: 1rem;
         }
         .net-config__group { display: flex; flex-direction: column; gap: 0.5rem; }
-        .net-config__label { font-size: var(--text-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+        .net-config__label { font-size: var(--text-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0; font-weight: 600; }
         .server-selector { display: flex; gap: 0.4rem; flex-wrap: wrap; }
         .server-btn {
           padding: 0.4rem 0.85rem; border-radius: var(--radius-sm);
@@ -461,7 +461,7 @@ export default function NetworkTester() {
         .net-grade-banner {
           display: flex; align-items: center; gap: 1.25rem;
           padding: 1.25rem; border-radius: var(--radius);
-          background: linear-gradient(135deg, var(--surface-2), var(--surface-1));
+          background: var(--surface-panel);
           border: 1px solid var(--border); margin-bottom: 1rem;
         }
         .net-grade-circle {
@@ -482,7 +482,6 @@ export default function NetworkTester() {
         .net-progress { width: 100%; }
         .net-progress__bar { width: 100%; height: 8px; background-color: var(--surface-2); border-radius: 4px; overflow: hidden; }
         .net-progress__fill { width: 0; height: 100%; border-radius: 4px; background: var(--accent); transition: width 0.4s ease; }
-        .status-inline { color: var(--text-muted); font-size: var(--text-sm); font-family: var(--font-mono); }
         .network-alert {
           padding: 0.75rem 1rem; border-radius: var(--radius-sm);
           border: 1px solid rgba(239,68,68,0.35);

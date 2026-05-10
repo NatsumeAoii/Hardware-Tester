@@ -179,7 +179,7 @@ export default function BluetoothTester() {
           border-radius: var(--radius); padding: 1rem; cursor: pointer;
           transition: all var(--transition); color: var(--text); text-align: left;
         }
-        .bt-device:hover, .bt-device:focus-visible { border-color: rgba(59,130,246,0.3); }
+        .bt-device:hover, .bt-device:focus-visible { border-color: var(--primary-glow); }
         .bt-device.selected { border-color: var(--primary); background: var(--primary-glow); }
         .bt-device__header { display: flex; align-items: center; gap: 0.5rem; }
         .bt-device__status { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; }
@@ -191,7 +191,6 @@ export default function BluetoothTester() {
           padding: 0.15rem 0.5rem; border-radius: 4px; font-family: var(--font-mono);
         }
         .bt-info { margin-top: 0.5rem; }
-        .status-inline { color: var(--text-muted); font-size: var(--text-sm); font-family: var(--font-mono); }
       `}</style>
         </section>
     );
