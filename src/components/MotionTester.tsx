@@ -138,7 +138,7 @@ export default function MotionTester() {
                                 <div className="info-grid info-grid--2-col">
                                     <div className="info-card"><h4>X</h4><p style={{ color: '#ef4444' }}>{fmt(accel.x)}</p></div>
                                     <div className="info-card"><h4>Y</h4><p style={{ color: '#22c55e' }}>{fmt(accel.y)}</p></div>
-                                    <div className="info-card"><h4>Z</h4><p style={{ color: 'var(--primary)' }}>{fmt(accel.z)}</p></div>
+                                    <div className="info-card"><h4>Z</h4><p style={{ color: '#3b82f6' }}>{fmt(accel.z)}</p></div>
                                     <div className="info-card"><h4>Magnitude</h4><p>{fmt(Math.sqrt(accel.x ** 2 + accel.y ** 2 + accel.z ** 2))}</p></div>
                                 </div>
                                 <h3 className="section-title">Gyroscope (degrees)</h3>
@@ -164,8 +164,8 @@ export default function MotionTester() {
           position: absolute; width: 140px; height: 140px;
           display: flex; align-items: center; justify-content: center;
           font-size: var(--text-xs); font-weight: 600; text-transform: uppercase;
-          letter-spacing: 0; border: 1px solid var(--border);
-          background: var(--primary-glow); backdrop-filter: blur(4px); color: var(--primary);
+          letter-spacing: 0.08em; border: 1px solid rgba(59,130,246,0.3);
+          background: rgba(59, 130, 246, 0.1); backdrop-filter: blur(4px); color: var(--primary);
         }
         .cube-face.front  { transform: translateZ(70px); }
         .cube-face.back   { transform: rotateY(180deg) translateZ(70px); }
@@ -180,6 +180,7 @@ export default function MotionTester() {
           border-radius: var(--radius-sm); padding: 0.75rem 1rem;
           font-size: var(--text-sm); text-align: left;
         }
+        .status-inline { color: var(--text-muted); font-size: var(--text-sm); font-family: var(--font-mono); }
         @media (max-width: 768px) { .motion-layout { grid-template-columns: 1fr; } .motion-cube-container { justify-self: center; } }
       `}</style>
         </section>

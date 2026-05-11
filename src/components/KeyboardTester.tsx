@@ -124,7 +124,7 @@ export default function KeyboardTester() {
             <style>{`
         .keyboard-wrapper {
           display: flex; justify-content: center; padding: 1.25rem; overflow-x: auto;
-          background: var(--surface-panel);
+          background: linear-gradient(135deg, var(--surface-1), var(--surface-2));
           border-radius: var(--radius); border: 1px solid var(--border);
         }
         .keyboard-grid { display: grid; grid-template-areas: "main edit numpad"; grid-template-columns: auto auto auto; gap: 24px; }

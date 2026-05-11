@@ -52,9 +52,9 @@ export default function MicTester() {
 
         // Gradient waveform stroke
         const grad = ctx.createLinearGradient(0, 0, w, 0);
-        grad.addColorStop(0, '#14b8a6');
-        grad.addColorStop(0.5, '#84cc16');
-        grad.addColorStop(1, '#14b8a6');
+        grad.addColorStop(0, '#3b82f6');
+        grad.addColorStop(0.5, '#8b5cf6');
+        grad.addColorStop(1, '#3b82f6');
 
         ctx.lineWidth = 2 * dpr;
         ctx.strokeStyle = grad;
@@ -190,12 +190,12 @@ export default function MicTester() {
             </div>
             <style>{`
         .mic-viz {
-          background: var(--surface-panel);
+          background: linear-gradient(135deg, var(--surface-1), var(--surface-2));
           padding: 1.25rem; border-radius: var(--radius);
           display: flex; flex-direction: column; gap: 1rem; border: 1px solid var(--border);
         }
         .mic-viz__section { display: flex; flex-direction: column; gap: 0.5rem; }
-        .mic-viz h4 { color: var(--text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0; font-weight: 500; }
+        .mic-viz h4 { color: var(--text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500; }
         .level-meter { width: 100%; height: 16px; background-color: var(--bg); border-radius: 8px; overflow: hidden; }
         .level-bar {
           width: 0; height: 100%;
@@ -204,6 +204,7 @@ export default function MicTester() {
           transition: width 0.1s linear; border-radius: 8px;
         }
         .waveform-canvas { width: 100%; height: 100px; background-color: var(--bg); border-radius: var(--radius-sm); }
+        .status-inline { color: var(--text-muted); font-size: var(--text-sm); font-family: var(--font-mono); }
       `}</style>
         </section>
     );

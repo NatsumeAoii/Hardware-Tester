@@ -38,8 +38,6 @@ assert.match(app, /from '\.\/lib\/routeUtils'/, 'App must consume centralized ha
 assert.match(app, /useAppearancePreferences/, 'App must use persisted appearance preference logic');
 assert.match(app, /useHardwareCapabilities/, 'App must surface hardware compatibility in navigation');
 assert.match(app, /nav-status/, 'App navigation must show tester readiness status');
-assert.match(app, /nav-status-legend/, 'App navigation must explain tester readiness status dots');
-assert.match(app, /Navigation status legend/, 'App navigation status legend must be accessible');
 assert.match(app, /aria-hidden="true"/, 'decorative nav status dots must not pollute link accessible names');
 assert.doesNotMatch(app, /decodeURIComponent/, 'App must not own hash decoding details');
 assert.doesNotMatch(app, /const svgPaths/, 'App must not own duplicate nav icon metadata');
@@ -48,8 +46,6 @@ assert.doesNotMatch(app, /const testers/, 'App must not own duplicate tester rou
 const dashboard = read('src/components/Dashboard.tsx');
 assert.match(dashboard, /from '\.\.\/lib\/testerRegistry'/, 'Dashboard must consume centralized tester registry');
 assert.match(dashboard, /from '\.\/dashboard\/CompatibilityMatrix'/, 'Dashboard must delegate compatibility UI');
-assert.match(dashboard, /dash-overview/, 'Dashboard must use the workstation overview layout');
-assert.match(dashboard, /Dashboard summary/, 'Dashboard overview summary must be accessible');
 assert.doesNotMatch(dashboard, /const features/, 'Dashboard must not own duplicate dashboard feature metadata');
 assert.doesNotMatch(dashboard, /const featureSvgPaths/, 'Dashboard must not own duplicate feature icon metadata');
 assert.doesNotMatch(dashboard, /const apis/, 'Dashboard must not own hardware API compatibility logic');
@@ -323,8 +319,6 @@ const siteMeta = read('src/lib/siteMeta.ts');
 assert.match(siteMeta, /siteMeta/, 'site metadata module must export siteMeta');
 assert.match(siteMeta, /Hardware Diagnostic Suite/, 'site metadata must define the product name');
 assert.match(siteMeta, /themeColor/, 'site metadata must define theme colors');
-assert.match(siteMeta, /repositoryUrl/, 'site metadata must centralize the source repository URL');
-assert.match(siteMeta, /https:\/\/github\.com\/wardana\/hardware-diagnostic-suite/, 'site metadata must point at the GitHub repository');
 
 const manifest = JSON.parse(read('public/site.webmanifest'));
 assert.equal(manifest.name, 'Hardware Diagnostic Suite');

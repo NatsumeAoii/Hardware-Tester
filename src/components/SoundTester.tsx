@@ -134,7 +134,7 @@ export default function SoundTester() {
             <style>{`
         .sound-controls {
           display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem;
-          background: var(--surface-panel);
+          background: linear-gradient(135deg, var(--surface-2), var(--surface-1));
           padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--border);
         }
         .control-group { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -151,6 +151,7 @@ export default function SoundTester() {
         }
         .wave-btn:hover { border-color: var(--primary); color: var(--text); }
         .wave-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .status-inline { color: var(--text-muted); font-size: var(--text-sm); font-family: var(--font-mono); }
         @media (max-width: 1024px) { .sound-controls { grid-template-columns: 1fr; } }
       `}</style>
         </section>

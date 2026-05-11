@@ -88,12 +88,12 @@ export default function VibrationTester() {
             <div className="tester-panel__body">
                 <div className="controls-bar">
                     <button className="btn" onClick={stopVibration} disabled={!activePattern}>Stop All</button>
-                    <div className="vib-custom-control">
-                        <label htmlFor="custom-ms">Custom:</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <label htmlFor="custom-ms" style={{ color: 'var(--text-muted)', fontSize: 'var(--text-sm)' }}>Custom:</label>
                         <input
                             type="range"
                             id="custom-ms"
-                            className="slider vib-custom-control__slider"
+                            className="slider"
                             min="50"
                             max="2000"
                             step="50"
@@ -102,6 +102,7 @@ export default function VibrationTester() {
                                 const next = Number(e.target.value);
                                 setCustomMs(Number.isFinite(next) ? Math.min(2000, Math.max(50, next)) : 300);
                             }}
+                            style={{ width: '120px' }}
                         />
                         <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--primary)', fontSize: 'var(--text-sm)', minWidth: '55px' }}>{customMs}ms</span>
                         <button className="btn btn--primary" onClick={playCustom} disabled={!isSupported}>Play</button>
@@ -139,18 +140,15 @@ export default function VibrationTester() {
             </div>
             <style>{`
         .vib-patterns { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.75rem; }
-        .vib-custom-control { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
-        .vib-custom-control label { color: var(--text-muted); font-size: var(--text-sm); }
-        .vib-custom-control__slider { width: min(160px, 32vw); }
         .vib-card {
-          background: var(--surface-panel);
+          background: linear-gradient(135deg, var(--surface-2), var(--surface-1));
           border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem;
           cursor: pointer; text-align: left; transition: all var(--transition);
           display: flex; flex-direction: column; gap: 0.35rem; font-family: var(--font);
           color: var(--text); position: relative; overflow: hidden;
         }
         .vib-card:disabled { opacity: 0.4; cursor: not-allowed; }
-        .vib-card:not(:disabled):hover { border-color: var(--primary-glow); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+        .vib-card:not(:disabled):hover { border-color: rgba(59,130,246,0.3); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
         .vib-card.active { border-color: var(--primary); background: var(--primary-glow); animation: vibPulse 0.3s ease; }
         .vib-card__vis { display: flex; align-items: flex-end; gap: 1px; height: 20px; margin-bottom: 0.25rem; }
         .vib-bar { height: 100%; border-radius: 1px; min-width: 2px; }
@@ -161,14 +159,10 @@ export default function VibrationTester() {
         .vib-card__duration { font-size: 10px; font-family: var(--font-mono); color: var(--text-muted); opacity: 0.6; }
         @keyframes vibPulse { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
         .vib-log { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; }
-        .vib-log h4 { color: var(--text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0; margin-bottom: 0.5rem; }
+        .vib-log h4 { color: var(--text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
         .vib-log__entries { display: flex; flex-wrap: wrap; gap: 0.4rem; max-height: 100px; overflow-y: auto; }
         .vib-log__entries span { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); background: var(--surface-3); padding: 0.2rem 0.5rem; border-radius: 4px; }
-        @media (max-width: 520px) {
-          .vib-custom-control { width: 100%; flex-wrap: wrap; }
-          .vib-custom-control__slider { width: 100%; }
-          .vib-custom-control .btn { width: 100%; }
-        }
+        .status-inline { color: var(--text-muted); font-size: var(--text-sm); font-family: var(--font-mono); }
       `}</style>
         </section>
     );

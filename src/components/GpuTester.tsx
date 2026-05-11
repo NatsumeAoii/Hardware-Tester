@@ -201,6 +201,7 @@ export default function GpuTester() {
           border-radius: var(--radius-sm); padding: 0.75rem 1rem;
           font-size: var(--text-sm);
         }
+        .status-inline { color: var(--text-muted); font-size: var(--text-sm); font-family: var(--font-mono); }
       `}</style>
         </section>
     );

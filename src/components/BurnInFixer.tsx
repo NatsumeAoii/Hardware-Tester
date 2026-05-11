@@ -181,7 +181,7 @@ export default function BurnInFixer() {
           font-family: var(--font);
         }
         .bi-mode:disabled { opacity: 0.5; cursor: not-allowed; }
-        .bi-mode:not(:disabled):hover { border-color: var(--primary-glow); }
+        .bi-mode:not(:disabled):hover { border-color: rgba(59,130,246,0.3); }
         .bi-mode.active { border-color: var(--primary); background: var(--primary-glow); }
         .bi-mode h4 { font-size: var(--text-sm); font-weight: 600; margin-bottom: 0.25rem; }
         .bi-mode p { font-size: var(--text-xs); color: var(--text-muted); line-height: 1.4; }
@@ -203,6 +203,7 @@ export default function BurnInFixer() {
           transition: all var(--transition); z-index: 10001;
         }
         .bi-overlay__stop:hover { background: rgba(239,68,68,0.6); }
+        .status-inline { color: var(--text-muted); font-size: var(--text-sm); font-family: var(--font-mono); }
         @media (max-width: 600px) { .bi-controls { grid-template-columns: 1fr; } }
       `}</style>
         </section>

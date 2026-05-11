@@ -130,11 +130,11 @@ export default function DoubleClickTester() {
                             <div className="info-card"><h4>Avg Interval</h4><p>{avgInterval ? `${avgInterval}ms` : '—'}</p></div>
                             <div className="info-card"><h4>Last Interval</h4><p>{lastInterval !== null ? `${lastInterval}ms` : '—'}</p></div>
                         </div>
-                        <div className="dc-threshold">
+                        <div className="control-group" style={{ width: '100%' }}>
                             <label htmlFor="dc-thresh">Threshold <span style={{ color: 'var(--primary)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>{threshold}ms</span></label>
                             <input type="range" id="dc-thresh" className="slider" value={threshold} min={50} max={500} step={10} onChange={e => setThreshold(parseInt(e.target.value))} />
                         </div>
-                        <button className="btn dc-reset" onClick={reset}>Reset Stats</button>
+                        <button className="btn" onClick={reset} style={{ width: '100%' }}>Reset Stats</button>
                     </div>
                 </div>
                 {clicksLog.length > 0 && (
@@ -148,7 +148,7 @@ export default function DoubleClickTester() {
         .dc-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; align-items: stretch; }
         .click-area {
           width: 100%; min-height: 280px;
-          background: var(--surface-panel);
+          background: linear-gradient(135deg, var(--surface-2), var(--surface-1));
           border: 2px dashed var(--border); border-radius: var(--radius);
           display: flex; justify-content: center; align-items: center;
           font-size: 1.25rem; color: var(--text-muted); cursor: pointer;
@@ -161,15 +161,13 @@ export default function DoubleClickTester() {
           animation: pulse 0.6s ease-out forwards;
         }
         .dc-sidebar { display: flex; flex-direction: column; gap: 1rem; }
-        .dc-threshold { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; }
-        .dc-reset { width: 100%; }
         .status--ok { border-color: rgba(34, 197, 94, 0.3); }
         .status--error { border-color: rgba(239, 68, 68, 0.3); }
         .click-log-container {
-          background: var(--surface-panel);
+          background: linear-gradient(135deg, var(--surface-1), var(--surface-2));
           border-radius: var(--radius); padding: 1rem; border: 1px solid var(--border);
         }
-        .click-log-container h4 { color: var(--text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0; margin-bottom: 0.5rem; }
+        .click-log-container h4 { color: var(--text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
         .click-log {
           display: flex; flex-wrap: wrap; gap: 0.5rem; max-height: 120px; overflow-y: auto;
           font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted);

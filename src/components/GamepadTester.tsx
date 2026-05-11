@@ -184,7 +184,7 @@ export default function GamepadTester() {
 
         .gp-axes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; }
         .gp-axis { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.75rem; }
-        .gp-axis__label { font-size: var(--text-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0; margin-bottom: 0.5rem; }
+        .gp-axis__label { font-size: var(--text-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
         .gp-axis__track { position: relative; height: 8px; background: var(--surface-3); border-radius: 4px; }
         .gp-axis__center { position: absolute; left: 50%; top: -2px; width: 2px; height: 12px; background: var(--text-muted); opacity: 0.3; transform: translateX(-50%); }
         .gp-axis__thumb { position: absolute; top: 50%; width: 14px; height: 14px; background: var(--primary); border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 8px var(--primary-glow); transition: left 16ms linear; }
@@ -192,7 +192,7 @@ export default function GamepadTester() {
 
         .gp-sticks { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
         .gp-stick-container { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
-        .gp-stick-label { font-size: var(--text-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0; }
+        .gp-stick-label { font-size: var(--text-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
         .gp-stick-area {
           width: 140px; height: 140px; border-radius: 50%;
           background: var(--surface-1); border: 1px solid var(--border);

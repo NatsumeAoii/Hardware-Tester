@@ -170,12 +170,13 @@ export default function GeolocationTester() {
         .geo-coords { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .geo-coord-card {
           display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
-          background: var(--surface-panel);
+          background: linear-gradient(135deg, var(--surface-2), var(--surface-1));
           border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem;
         }
-        .geo-coord-label { font-size: var(--text-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0; }
+        .geo-coord-label { font-size: var(--text-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
         .geo-coord-value { font-size: 1.75rem; font-weight: 700; font-family: var(--font-mono); color: var(--text); }
         .geo-coord-dms { font-size: var(--text-xs); color: var(--text-muted); font-family: var(--font-mono); }
+        .status-inline { color: var(--text-muted); font-size: var(--text-sm); font-family: var(--font-mono); }
         @media (max-width: 480px) { .geo-coords { grid-template-columns: 1fr; } }
       `}</style>
         </section>

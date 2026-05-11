@@ -3,7 +3,6 @@ export const siteMeta = {
     shortName: 'Hardware Suite',
     description: 'Browser-based hardware diagnostics for keyboards, mice, displays, cameras, microphones, sensors, networks, printers, and mobile devices.',
     locale: 'en',
-    repositoryUrl: 'https://github.com/wardana/hardware-diagnostic-suite',
     keywords: [
         'hardware diagnostic',
         'keyboard test',
@@ -27,7 +26,6 @@ export const siteStructuredData = {
     applicationCategory: 'UtilitiesApplication',
     operatingSystem: 'Windows, macOS, Linux, Android, iOS',
     description: siteMeta.description,
-    codeRepository: siteMeta.repositoryUrl,
     offers: {
         '@type': 'Offer',
         price: '0',

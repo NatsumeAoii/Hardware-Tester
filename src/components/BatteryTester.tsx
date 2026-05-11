@@ -168,7 +168,7 @@ export default function BatteryTester() {
         .batt-gauge__ring { position: relative; display: flex; align-items: center; justify-content: center; }
         .batt-gauge__center { position: absolute; display: flex; flex-direction: column; align-items: center; }
         .batt-gauge__pct { font-size: 2.5rem; font-weight: 800; font-family: var(--font-mono); line-height: 1; }
-        .batt-gauge__label { font-size: var(--text-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0; margin-top: 0.25rem; }
+        .batt-gauge__label { font-size: var(--text-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.25rem; }
         .batt-charging-badge {
           display: flex; align-items: center; gap: 0.35rem;
           background: rgba(34, 197, 94, 0.15); color: var(--success);
