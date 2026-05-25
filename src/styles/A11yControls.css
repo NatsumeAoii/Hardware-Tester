@@ -1,0 +1,58 @@
+.a11y-controls {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  z-index: 1000;
+  background: var(--overlay-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.35rem;
+  box-shadow: var(--shadow);
+}
+
+.theme-mode-group {
+  display: flex;
+  gap: 0.25rem;
+  padding-right: 0.35rem;
+  margin-right: 0.1rem;
+  border-right: 1px solid var(--border);
+}
+
+.a11y-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  padding: 0.55rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--text-muted);
+}
+
+.a11y-btn:hover {
+  background-color: var(--surface-3);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.a11y-btn.active {
+  background: var(--accent);
+  color: white;
+  border-color: transparent;
+}
+
+@media (max-width: 560px) {
+  .a11y-controls {
+    left: 1rem;
+    right: 1rem;
+    justify-content: center;
+  }
+}

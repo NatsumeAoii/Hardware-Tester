@@ -135,11 +135,11 @@ export default function CompatibilityMatrix() {
         .compatibility-item__main { min-width: 0; display: flex; flex-direction: column; gap: 0.12rem; }
         .compatibility-item__label { font-size: var(--text-sm); font-weight: 650; }
         .compatibility-item__reason {
-          color: var(--text-muted); font-size: 11px; line-height: 1.35;
+          color: var(--text-muted); font-size: 0.6875rem; line-height: 1.35;
           display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
         .compatibility-item__meta, .compatibility-item__status {
-          border-radius: 999px; padding: 0.2rem 0.5rem; font-size: 10px;
+          border-radius: 999px; padding: 0.2rem 0.5rem; font-size: 0.625rem;
           text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap;
         }
         .compatibility-item__meta { color: var(--text-muted); background: var(--surface-2); }

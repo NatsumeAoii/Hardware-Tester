@@ -20,7 +20,14 @@ export type TesterId =
     | 'bluetooth'
     | 'burn-in'
     | 'printer'
-    | 'report';
+    | 'report'
+    | 'usb-storage'
+    | 'multi-monitor'
+    | 'nfc'
+    | 'serial-hid'
+    | 'clipboard'
+    | 'wake-lock'
+    | 'benchmark';
 
 export type TesterGroupKey = 'main' | 'input' | 'media' | 'system' | 'sensors' | 'advanced' | 'tools';
 
@@ -29,6 +36,11 @@ export interface TesterMeta {
     label: string;
     group: TesterGroupKey;
     dashboardDescription?: string;
+}
+
+export interface ReportGroup {
+    name: string;
+    testerIds: TesterId[];
 }
 
 export const DEFAULT_TESTER: TesterId = 'dashboard';
@@ -56,16 +68,23 @@ export const testers: TesterMeta[] = [
     { id: 'sound', label: 'Sound', group: 'media', dashboardDescription: 'Tone generator with waveforms' },
     { id: 'webcam', label: 'Webcam', group: 'media', dashboardDescription: 'Feed, FPS and photo capture' },
     { id: 'vibration', label: 'Vibration', group: 'media', dashboardDescription: 'Haptic pattern testing' },
+    { id: 'multi-monitor', label: 'Multi-Monitor', group: 'media', dashboardDescription: 'Detect and map connected displays' },
     { id: 'battery', label: 'Battery', group: 'system', dashboardDescription: 'Health, charging and discharge time' },
     { id: 'gpu', label: 'GPU', group: 'system', dashboardDescription: 'WebGL info and 3D stress test' },
     { id: 'bluetooth', label: 'Bluetooth', group: 'system', dashboardDescription: 'Scan nearby BLE devices' },
+    { id: 'usb-storage', label: 'USB/Storage', group: 'system', dashboardDescription: 'Storage quota and usage info' },
+    { id: 'wake-lock', label: 'Wake Lock', group: 'system', dashboardDescription: 'Prevent screen dimming' },
+    { id: 'benchmark', label: 'Benchmark', group: 'system', dashboardDescription: 'CPU and memory performance test' },
     { id: 'motion', label: 'Motion', group: 'sensors', dashboardDescription: 'Gyroscope and accelerometer' },
     { id: 'geolocation', label: 'Geolocation', group: 'sensors', dashboardDescription: 'GPS accuracy and coordinates' },
     { id: 'ambient-light', label: 'Light Sensor', group: 'sensors', dashboardDescription: 'Ambient light and proximity' },
     { id: 'midi', label: 'MIDI', group: 'advanced', dashboardDescription: 'Musical instrument input monitor' },
     { id: 'network', label: 'Network', group: 'advanced', dashboardDescription: 'Speed, ping and jitter analysis' },
+    { id: 'nfc', label: 'NFC', group: 'advanced', dashboardDescription: 'Read NFC tags and NDEF records' },
+    { id: 'serial-hid', label: 'Serial/HID', group: 'advanced', dashboardDescription: 'Raw device communication' },
     { id: 'burn-in', label: 'Burn-in Fix', group: 'tools', dashboardDescription: 'Stuck pixel recovery tool' },
     { id: 'printer', label: 'Print Test', group: 'tools', dashboardDescription: 'Calibration print page' },
+    { id: 'clipboard', label: 'Clipboard', group: 'tools', dashboardDescription: 'Test clipboard read and write' },
 ];
 
 const testerIdSet = new Set<TesterId>(testers.map(tester => tester.id));
@@ -73,6 +92,19 @@ const testerIdSet = new Set<TesterId>(testers.map(tester => tester.id));
 export const isTesterId = (value: string): value is TesterId => testerIdSet.has(value as TesterId);
 
 export const dashboardTesters = testers.filter(tester => tester.dashboardDescription);
+
+export const reportGroups: ReportGroup[] = [
+    { name: 'Input Devices', testerIds: ['keyboard', 'mouse', 'double-click', 'gamepad', 'touch', 'midi'] },
+    { name: 'Output & Media', testerIds: ['screen', 'mic', 'sound', 'webcam', 'vibration', 'multi-monitor'] },
+    { name: 'System & Sensors', testerIds: ['battery', 'gpu', 'motion', 'geolocation', 'ambient-light', 'bluetooth', 'usb-storage', 'wake-lock', 'benchmark'] },
+    { name: 'Network & Connectivity', testerIds: ['network'] },
+    { name: 'Advanced', testerIds: ['nfc', 'serial-hid'] },
+    { name: 'Utilities', testerIds: ['burn-in', 'printer', 'clipboard'] },
+];
+
+export const reportTesterIds = reportGroups.flatMap(group => group.testerIds);
+
+export const testerById = new Map<TesterId, TesterMeta>(testers.map(tester => [tester.id, tester]));
 
 export const navIconPaths: Record<TesterId, string> = {
     dashboard: 'M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z',
@@ -97,11 +129,11 @@ export const navIconPaths: Record<TesterId, string> = {
     'burn-in': 'M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14z',
     printer: 'M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z',
     report: 'M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z',
+    'usb-storage': 'M15 7v4h1v2h-3V5h2l-3-4-3 4h2v8H8v-2.07c.7-.37 1.2-1.08 1.2-1.93 0-1.21-.99-2.2-2.2-2.2-1.21 0-2.2.99-2.2 2.2 0 .85.5 1.56 1.2 1.93V13c0 1.11.89 2 2 2h3v3.05c-.71.37-1.2 1.1-1.2 1.95 0 1.22.99 2.2 2.2 2.2 1.21 0 2.2-.98 2.2-2.2 0-.85-.49-1.58-1.2-1.95V15h3c1.11 0 2-.89 2-2v-2h1V7h-4z',
+    'multi-monitor': 'M20 3H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h6v2H8v2h8v-2h-2v-2h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 12H4V5h16v10zm-7-5h5v4h-5V10zm-2 0v4H4v-4h7z',
+    nfc: 'M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H4V4h16v16zM18 6h-5c-1.1 0-2 .9-2 2v2.28c-.6.35-1 .98-1 1.72 0 1.1.9 2 2 2s2-.9 2-2c0-.74-.4-1.37-1-1.72V8h3v8H8V8h2V6H6v12h12V6z',
+    'serial-hid': 'M15 7.5V2H9v5.5l3 3 3-3zM7.5 9H2v6h5.5l3-3-3-3zM9 16.5V22h6v-5.5l-3-3-3 3zM16.5 9l-3 3 3 3H22V9h-5.5z',
+    clipboard: 'M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z',
+    'wake-lock': 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z',
+    benchmark: 'M19.8 18.4L14 10.67V6.5l1.35-1.69c.26-.33.03-.81-.39-.81H9.04c-.42 0-.65.48-.39.81L10 6.5v4.17L4.2 18.4c-.49.66-.02 1.6.8 1.6h14c.82 0 1.29-.94.8-1.6z',
 };
-
-export const techStack = [
-    { name: 'React', version: '19', color: '#61dafb' },
-    { name: 'TypeScript', version: '6.0', color: '#3178c6' },
-    { name: 'Vite', version: '8', color: '#bd34fe' },
-    { name: 'Lightning CSS', version: '1.32', color: '#f0db4f' },
-];

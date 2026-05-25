@@ -6,6 +6,10 @@ const root = process.cwd();
 const read = (path) => readFileSync(join(root, path), 'utf8');
 
 const packageJson = JSON.parse(read('package.json'));
+assert.equal(packageJson.description, 'Browser-based hardware diagnostics for desktop and mobile devices.');
+assert.equal(packageJson.license, 'MIT');
+assert.equal(packageJson.engines.node, '>=22.0.0');
+assert.equal(packageJson.engines.npm, '>=10.0.0');
 assert.equal(packageJson.scripts.test, 'vitest run');
 assert.equal(packageJson.scripts['test:smoke'], 'node scripts/frontend-smoke.mjs');
 assert.equal(packageJson.scripts['test:e2e'], 'playwright test');
@@ -17,6 +21,7 @@ assert.ok(existsSync(join(root, 'src/lib/userSafeErrors.ts')), 'user-safe browse
 assert.ok(existsSync(join(root, 'src/lib/browserAdapters.ts')), 'browser API adapters must centralize experimental hardware API typing');
 assert.ok(existsSync(join(root, 'src/lib/networkDiagnostics.ts')), 'network diagnostic logic must be isolated from the UI component');
 assert.ok(existsSync(join(root, 'src/lib/diagnosticState.ts')), 'diagnostic state helpers must be centralized');
+assert.ok(existsSync(join(root, 'src/lib/deviceDiagnostics.ts')), 'device diagnostic probes must be centralized');
 assert.ok(existsSync(join(root, 'src/lib/formatters.ts')), 'shared display formatters must be centralized');
 assert.ok(existsSync(join(root, 'src/lib/graphicsDiagnostics.ts')), 'WebGL diagnostic helpers must be centralized');
 assert.ok(existsSync(join(root, 'src/lib/lifecycle.ts')), 'lifecycle cleanup helpers must be centralized');
@@ -35,13 +40,28 @@ assert.ok(existsSync(join(root, 'tests/e2e/app.spec.ts')), 'browser route regres
 const app = read('src/App.tsx');
 assert.match(app, /from '\.\/lib\/testerRegistry'/, 'App must consume centralized tester registry');
 assert.match(app, /from '\.\/lib\/routeUtils'/, 'App must consume centralized hash route logic');
-assert.match(app, /useAppearancePreferences/, 'App must use persisted appearance preference logic');
-assert.match(app, /useHardwareCapabilities/, 'App must surface hardware compatibility in navigation');
-assert.match(app, /nav-status/, 'App navigation must show tester readiness status');
-assert.match(app, /aria-hidden="true"/, 'decorative nav status dots must not pollute link accessible names');
+
+const sidebar = read('src/components/Sidebar.tsx');
+assert.match(sidebar, /appVersionLabel/, 'Sidebar must render the visible version from changelog metadata');
+assert.match(sidebar, /repositoryUrl/, 'Sidebar must include the repository link');
+assert.match(sidebar, /bugReportUrl/, 'Sidebar must include the bug report link');
+assert.match(sidebar, /https:\/\/github\.com\/NatsumeAoii\/Hardware-Tester/, 'Sidebar must use the current repository URL');
+assert.doesNotMatch(sidebar, /github\.com\/wardana\/hardware-diagnostic-suite/, 'Sidebar must not link to the old repository');
+assert.match(sidebar, /sidebar__support/, 'Sidebar must place project links near the navigation items');
+assert.match(sidebar, /GitHub repo/, 'Sidebar must label the repository link');
+assert.match(sidebar, /Report a bug/, 'Sidebar must label the bug report link');
+assert.doesNotMatch(sidebar, /Credit|projectCredit|credit-info|Hardware Diagnostic Suite contributors/, 'Sidebar must not render a separate credit block');
+assert.match(sidebar, /useHardwareCapabilities/, 'Sidebar must surface hardware compatibility in navigation');
+assert.match(sidebar, /nav-status/, 'Sidebar navigation must show tester readiness status');
+assert.match(sidebar, /aria-hidden="true"/, 'decorative nav status dots must not pollute link accessible names');
+
+const a11yControls = read('src/components/A11yControls.tsx');
+assert.match(a11yControls, /useAppearancePreferences/, 'A11yControls must use persisted appearance preference logic');
+
 assert.doesNotMatch(app, /decodeURIComponent/, 'App must not own hash decoding details');
 assert.doesNotMatch(app, /const svgPaths/, 'App must not own duplicate nav icon metadata');
 assert.doesNotMatch(app, /const testers/, 'App must not own duplicate tester route metadata');
+assert.doesNotMatch(app, /React 19|TypeScript|Vite|Lightning CSS/, 'App chrome must not render tech stack labels');
 
 const dashboard = read('src/components/Dashboard.tsx');
 assert.match(dashboard, /from '\.\.\/lib\/testerRegistry'/, 'Dashboard must consume centralized tester registry');
@@ -49,13 +69,17 @@ assert.match(dashboard, /from '\.\/dashboard\/CompatibilityMatrix'/, 'Dashboard 
 assert.doesNotMatch(dashboard, /const features/, 'Dashboard must not own duplicate dashboard feature metadata');
 assert.doesNotMatch(dashboard, /const featureSvgPaths/, 'Dashboard must not own duplicate feature icon metadata');
 assert.doesNotMatch(dashboard, /const apis/, 'Dashboard must not own hardware API compatibility logic');
+assert.doesNotMatch(dashboard, /Tech Stack|techStack|dash-tech-stack|tech-badge|Built with React|TypeScript|Vite|Lightning CSS/, 'Dashboard must not render tech stack content');
 
 const registry = read('src/lib/testerRegistry.ts');
 for (const id of ['dashboard', 'keyboard', 'screen', 'ambient-light', 'printer', 'report']) {
   assert.match(registry, new RegExp(`id: '${id}'`), `registry missing ${id}`);
 }
 assert.match(registry, /dashboardDescription:/, 'registry must include dashboard feature descriptions');
-assert.match(registry, /techStack/, 'registry must expose tech stack metadata');
+assert.doesNotMatch(registry, /techStack/, 'registry must not retain page tech stack metadata');
+
+const changelogVersion = read('src/lib/changelogVersion.ts');
+assert.match(changelogVersion, /\.\.\/\.\.\/CHANGELOG\.md\?raw/, 'visible app version must derive from the changelog file');
 
 const appearanceHook = read('src/hooks/useAppearancePreferences.ts');
 assert.match(appearanceHook, /from '\.\.\/lib\/storageUtils'/, 'appearance preferences must use safe storage helpers');
@@ -79,6 +103,7 @@ const capabilityHook = read('src/hooks/useHardwareCapabilities.ts');
 assert.match(capabilityHook, /useHardwareCapabilities/, 'hardware compatibility hook must be named');
 assert.match(capabilityHook, /resize/, 'hardware compatibility hook must react to viewport changes');
 assert.match(capabilityHook, /visibilitychange/, 'hardware compatibility hook must refresh on tab visibility');
+assert.match(capabilityHook, /useHardwareCapabilitiesSnapshot\(contextSnapshot === null\)/, 'hardware compatibility hook must keep refresh behavior outside its provider');
 
 const compatibilityPanel = read('src/components/dashboard/CompatibilityMatrix.tsx');
 assert.match(compatibilityPanel, /CompatibilityMatrix/, 'compatibility panel must export the dashboard component');
@@ -103,7 +128,7 @@ for (const componentPath of [
   assert.doesNotMatch(content, /console\.error/, `${componentPath} must not leak diagnostics to console in user flows`);
 }
 
-const printer = read('src/components/PrinterTest.tsx');
+const printer = read('src/components/PrinterTester.tsx');
 assert.match(printer, /print-color-adjust:\s*exact/i, 'print page must preserve calibration colors');
 assert.match(printer, /-webkit-print-color-adjust:\s*exact/i, 'print page must preserve calibration colors in Chromium');
 assert.match(printer, /\.print-page,\s*\.print-page \*/s, 'print-color-adjust must apply to every printable child');
@@ -124,6 +149,9 @@ assert.match(networkDiagnostics, /parseCloudflareTrace/, 'network diagnostics mu
 assert.match(networkDiagnostics, /fetchIpWithFallback/, 'network diagnostics must retain cascading public IP fallback logic');
 assert.match(networkDiagnostics, /appendCacheBust/, 'network diagnostics must add cache-busting parameters safely');
 
+const networkRunner = read('src/lib/networkDiagnosticRunner.ts');
+assert.match(networkRunner, /from '\.\/lifecycle'/, 'network runner must use centralized lifecycle helpers for abortable pacing');
+
 const formatters = read('src/lib/formatters.ts');
 for (const exportedName of [
   'EMPTY_VALUE',
@@ -143,6 +171,11 @@ const diagnosticState = read('src/lib/diagnosticState.ts');
 assert.match(diagnosticState, /DiagnosticPhase/, 'diagnostic state must model phases');
 assert.match(diagnosticState, /createDiagnosticState/, 'diagnostic state must expose a state factory');
 assert.match(diagnosticState, /getDiagnosticMessage/, 'diagnostic state must expose stable message extraction');
+
+const deviceDiagnostics = read('src/lib/deviceDiagnostics.ts');
+assert.match(deviceDiagnostics, /detectBrowserFromUserAgent/, 'device diagnostics must centralize browser detection');
+assert.match(deviceDiagnostics, /detectDeviceTypeFromUserAgent/, 'device diagnostics must centralize device type detection');
+assert.match(deviceDiagnostics, /readBatterySnapshot/, 'device diagnostics must centralize battery value extraction');
 
 const permissions = read('src/lib/permissions.ts');
 assert.match(permissions, /queryPermissionState/, 'permissions module must safely query browser permissions');
@@ -212,6 +245,7 @@ assert.match(motion, /from '\.\.\/lib\/permissions'/, 'Motion tester must use ce
 assert.match(motion, /formatUserSafeError/, 'Motion tester must map permission failures to user-safe messages');
 assert.match(motion, /motion-alert/, 'Motion tester must keep permission/runtime failures visible');
 assert.doesNotMatch(motion, /unknown as PermissionCapableSensorEvent/, 'Motion tester must not own motion permission API casts');
+assert.doesNotMatch(motion, /startListening\(\);\s*\}\s*return \(\) => \{ stopListening\(\); \};/s, 'Motion tester must not start sensor listeners on mount');
 
 const screen = read('src/components/ScreenTester.tsx');
 assert.match(screen, /screen-alert/, 'Screen tester must keep fullscreen failures visible');
@@ -238,7 +272,6 @@ for (const componentPath of [
   'src/components/GpuTester.tsx',
   'src/components/MicTester.tsx',
   'src/components/MouseTester.tsx',
-  'src/components/NetworkTester.tsx',
   'src/components/ScreenTester.tsx',
   'src/components/VibrationTester.tsx',
   'src/components/WebcamTester.tsx',
@@ -271,9 +304,24 @@ for (const componentPath of [
   assert.match(read(componentPath), /from '\.\.\/lib\/diagnosticState'/, `${componentPath} must use shared diagnostic state helpers`);
 }
 
+const midi = read('src/components/MidiTester.tsx');
+assert.match(midi, /Connect MIDI/, 'MIDI tester must require explicit user action before requesting MIDI access');
+assert.doesNotMatch(midi, /useEffect\(\(\) => \{\s*connectMidi\(\);/s, 'MIDI tester must not request MIDI access on mount');
+
+const ambientLight = read('src/components/AmbientLightTester.tsx');
+assert.match(ambientLight, /Start Sensors/, 'ambient light tester must require explicit user action before starting sensors');
+assert.doesNotMatch(ambientLight, /initALS\(\);\s*initProximity\(\);/s, 'ambient light tester must not start sensors on mount');
+
 const report = read('src/components/SystemReport.tsx');
 assert.match(report, /printWhenFontsReady/, 'system report print action should wait for fonts through the shared adapter');
 assert.match(report, /print-color-adjust:\s*exact/i, 'system report print styles must preserve colors');
+assert.match(report, /from '\.\.\/lib\/testerRegistry'/, 'system report must derive test groups from the centralized tester registry');
+assert.doesNotMatch(report, /const ALL_TESTS/, 'system report must not duplicate the tester list');
+assert.doesNotMatch(report, /const TEST_GROUPS/, 'system report must not duplicate tester group metadata');
+
+const testerComponents = read('src/testerComponents.ts');
+assert.match(testerComponents, /Record<TesterId, ComponentType>/, 'tester component map must be a typed registry keyed by every TesterId');
+assert.match(app, /from '\.\/testerComponents'/, 'App must consume the typed tester component map');
 
 for (const componentPath of [
   'src/components/AmbientLightTester.tsx',
@@ -309,7 +357,9 @@ assert.match(vitestConfig, /src\/lib\/__tests__\/\*\*\/\*\.test\.ts/, 'Vitest mu
 
 const indexHtml = read('index.html');
 assert.match(indexHtml, /<meta name="theme-color"/, 'index must declare theme colors');
+assert.match(indexHtml, /<link rel="canonical" href="(?:\[FILL IN: PUBLIC_CANONICAL_URL\]|https:\/\/[^"]+)"/, 'index must include a marked placeholder or HTTPS canonical URL');
 assert.match(indexHtml, /<meta property="og:title"/, 'index must include Open Graph title');
+assert.match(indexHtml, /<meta property="og:url" content="(?:\[FILL IN: PUBLIC_CANONICAL_URL\]|https:\/\/[^"]+)"/, 'index must include a marked placeholder or HTTPS Open Graph URL');
 assert.match(indexHtml, /<meta name="twitter:card"/, 'index must include Twitter card metadata');
 assert.match(indexHtml, /<meta name="application-name"/, 'index must include application metadata');
 assert.match(indexHtml, /<link rel="manifest" href="\/site\.webmanifest"/, 'index must link the web app manifest');
@@ -324,4 +374,4 @@ const manifest = JSON.parse(read('public/site.webmanifest'));
 assert.equal(manifest.name, 'Hardware Diagnostic Suite');
 assert.equal(manifest.display, 'standalone');
 
-console.log('frontend smoke checks passed');
+process.stdout.write('frontend smoke checks passed\n');

@@ -156,7 +156,7 @@ export default function VibrationTester() {
         .vib-bar.off { background: transparent; }
         .vib-card h3 { font-size: var(--text-sm); font-weight: 600; }
         .vib-card p { font-size: var(--text-xs); color: var(--text-muted); line-height: 1.4; }
-        .vib-card__duration { font-size: 10px; font-family: var(--font-mono); color: var(--text-muted); opacity: 0.6; }
+        .vib-card__duration { font-size: 0.625rem; font-family: var(--font-mono); color: var(--text-muted); opacity: 0.6; }
         @keyframes vibPulse { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
         .vib-log { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; }
         .vib-log h4 { color: var(--text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }

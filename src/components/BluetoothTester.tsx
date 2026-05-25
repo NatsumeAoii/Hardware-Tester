@@ -187,7 +187,7 @@ export default function BluetoothTester() {
         .bt-device__id { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-muted); margin-left: auto; }
         .bt-device__services { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
         .bt-service-tag {
-          font-size: 10px; background: var(--surface-3); color: var(--text-muted);
+          font-size: 0.625rem; background: var(--surface-3); color: var(--text-muted);
           padding: 0.15rem 0.5rem; border-radius: 4px; font-family: var(--font-mono);
         }
         .bt-info { margin-top: 0.5rem; }

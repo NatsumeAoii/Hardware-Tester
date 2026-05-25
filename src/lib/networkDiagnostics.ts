@@ -1,3 +1,5 @@
+import { EMPTY_VALUE, NOT_AVAILABLE } from './formatters';
+
 export interface TestServer {
     id: string;
     name: string;
@@ -200,10 +202,11 @@ export function parseCloudflareTrace(text: string): TraceInfo {
     };
 }
 
-export async function fetchIpWithFallback(): Promise<IpInfo> {
+export async function fetchIpWithFallback(signal?: AbortSignal): Promise<IpInfo> {
     for (const api of ipApis) {
+        if (signal?.aborted) return { ip: 'Unavailable', isp: 'Unavailable', location: 'Unavailable' };
         try {
-            const response = await fetchWithTimeout(api.url, { cache: 'no-store' });
+            const response = await fetchWithTimeout(api.url, { cache: 'no-store', signal });
             if (!response.ok) continue;
             const data = await response.json() as unknown;
             const info = api.parse(data);
@@ -213,11 +216,15 @@ export async function fetchIpWithFallback(): Promise<IpInfo> {
         }
     }
 
+    if (signal?.aborted) return { ip: 'Unavailable', isp: 'Unavailable', location: 'Unavailable' };
+
     try {
-        const response = await fetchWithTimeout('https://cloudflare.com/cdn-cgi/trace', { cache: 'no-store' });
-        const values = parseTraceMap(await response.text());
-        const ip = values.get('ip');
-        if (ip) return { ip, isp: FALLBACK_LABEL, location: FALLBACK_LABEL };
+        const response = await fetchWithTimeout('https://cloudflare.com/cdn-cgi/trace', { cache: 'no-store', signal });
+        if (response.ok) {
+            const values = parseTraceMap(await response.text());
+            const ip = values.get('ip');
+            if (ip) return { ip, isp: FALLBACK_LABEL, location: FALLBACK_LABEL };
+        }
     } catch {
         // Final fallback intentionally returns a user-facing unavailable state below.
     }
@@ -291,4 +298,3 @@ export function calculateJitterMs(samples: number[]): number | null {
     return Math.round(Math.sqrt(diffs.reduce((total, diff) => total + diff * diff, 0) / diffs.length));
 }
 
-import { EMPTY_VALUE, NOT_AVAILABLE } from './formatters';

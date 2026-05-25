@@ -39,7 +39,7 @@ export function formatDurationFromSeconds(
 }
 
 export function formatMilliseconds(value: number): string {
-    if (value < 0) return 'Error';
+    if (!Number.isFinite(value) || value < 0) return 'Error';
     if (value === 0) return EMPTY_VALUE;
     return `${value} ms`;
 }
@@ -50,7 +50,7 @@ export function formatResolution(width: number | undefined, height: number | und
 }
 
 export function formatSpeedMbps(value: number): string {
-    if (value < 0) return 'Error';
+    if (!Number.isFinite(value) || value < 0) return 'Error';
     if (value === 0) return EMPTY_VALUE;
     return `${value.toFixed(1)} Mbps`;
 }
@@ -58,4 +58,28 @@ export function formatSpeedMbps(value: number): string {
 export function formatSignedDegrees(value: number | null | undefined): string {
     if (value == null || !Number.isFinite(value)) return EMPTY_VALUE;
     return `${value.toFixed(0)}°`;
+}
+
+export function formatHhMmSs(totalSeconds: number): string {
+    const safe = Math.max(0, Math.floor(Number.isFinite(totalSeconds) ? totalSeconds : 0));
+    const hh = Math.floor(safe / 3600).toString().padStart(2, '0');
+    const mm = Math.floor((safe % 3600) / 60).toString().padStart(2, '0');
+    const ss = (safe % 60).toString().padStart(2, '0');
+    return `${hh}:${mm}:${ss}`;
+}
+
+export function formatOpsPerSecond(operations: number, durationMs: number): string {
+    if (durationMs <= 0 || !Number.isFinite(durationMs) || !Number.isFinite(operations) || operations < 0) {
+        return NOT_AVAILABLE;
+    }
+    const opsPerSec = operations / (durationMs / 1000);
+    return new Intl.NumberFormat('en-US').format(Math.round(opsPerSec)) + ' ops/s';
+}
+
+export function formatMbPerSecond(bytes: number, durationMs: number): string {
+    if (durationMs <= 0 || !Number.isFinite(durationMs) || !Number.isFinite(bytes) || bytes < 0) {
+        return NOT_AVAILABLE;
+    }
+    const mbPerSec = bytes / (durationMs / 1000) / 1_000_000;
+    return mbPerSec.toFixed(2) + ' MB/s';
 }

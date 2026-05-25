@@ -42,7 +42,7 @@ export default function ScreenTester() {
 
     const exitFullscreen = useCallback(() => {
         const exit = exitDocumentFullscreen();
-        if (exit) exit.catch(() => { });
+        if (exit) exit.catch(() => { /* fullscreen exit can be rejected after manual escape */ });
         document.documentElement.style.overflow = '';
     }, []);
 
@@ -91,7 +91,7 @@ export default function ScreenTester() {
             cancelAnimationFrameIfSet(frameId);
             document.removeEventListener('fullscreenchange', handleFullscreenChange);
             const exit = exitDocumentFullscreen();
-            if (exit) exit.catch(() => { });
+            if (exit) exit.catch(() => { /* fullscreen exit can be rejected during unmount */ });
         };
     }, []);
 

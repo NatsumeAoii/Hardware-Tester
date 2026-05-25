@@ -1,21 +1,15 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { EMPTY_VALUE, formatMilliseconds, formatSpeedMbps } from '../lib/formatters';
-import { abortableDelay } from '../lib/lifecycle';
 import { formatUserSafeError, isAbortError } from '../lib/userSafeErrors';
+import { runNetworkDiagnostic } from '../lib/networkDiagnosticRunner';
 import {
     DOWNLOAD_SIZES,
     NETWORK_TEST_SERVERS as SERVERS,
-    SPEED_FETCH_TIMEOUT_MS,
     appendCacheBust,
-    averageSamples,
-    calculateJitterMs,
     fetchIpWithFallback,
     fetchWithTimeout,
-    getNetworkGrade as getGrade,
     getNetworkGradeColor as getGradeColor,
-    getNetworkQualityClass as getQualityClass,
     parseCloudflareTrace,
-    trimLatencySamples,
     type TestResult,
     type TraceInfo,
 } from '../lib/networkDiagnostics';
@@ -94,34 +88,25 @@ export default function NetworkTester() {
     const controllerRef = useRef<AbortController | null>(null);
     const isTestingRef = useRef(false);
 
-    // Refs to track latest values for grade computation (avoids nested setState)
-    const pingRef = useRef(0);
-    const jitterRef = useRef(0);
-    const downloadRef = useRef(0);
-    const uploadRef = useRef(0);
-    const lossRef = useRef(0);
-
     const server = useMemo(() => SERVERS.find(s => s.id === selectedServer) || SERVERS[0], [selectedServer]);
     const testSize = useMemo(() => DOWNLOAD_SIZES[selectedSize], [selectedSize]);
 
-    // Fetch IP info using cascading fallback
-    const loadIpInfo = useCallback(async () => {
-        const info = await fetchIpWithFallback();
+    const loadConnectionDetails = useCallback(async (signal?: AbortSignal) => {
+        const info = await fetchIpWithFallback(signal);
+        if (signal?.aborted) return;
         setPublicIp(info.ip);
         setIsp(info.isp);
         setLocation(info.location);
-    }, []);
-
-    // Fetch Cloudflare trace for DNS/routing info
-    const loadTrace = useCallback(async () => {
         try {
             const resp = await fetchWithTimeout(appendCacheBust('https://cloudflare.com/cdn-cgi/trace'), {
                 cache: 'no-store',
+                signal,
             });
             const text = await resp.text();
+            if (signal?.aborted) return;
             setTraceInfo(parseCloudflareTrace(text));
         } catch {
-            setTraceInfo(null);
+            if (!signal?.aborted) setTraceInfo(null);
         }
     }, []);
 
@@ -137,8 +122,6 @@ export default function NetworkTester() {
         setPing(0); setJitter(0); setDownload(0); setUpload(0); setPacketLoss(0); setGrade('');
         setPingQuality(''); setJitterQuality(''); setDownloadQuality(''); setUploadQuality('');
         setNetworkError('');
-        pingRef.current = 0; jitterRef.current = 0;
-        downloadRef.current = 0; uploadRef.current = 0; lossRef.current = 0;
     }, []);
 
     const stopTest = useCallback(() => {
@@ -148,135 +131,47 @@ export default function NetworkTester() {
         setShowProgress(false);
     }, []);
 
-    const runPingJitterTest = useCallback(async () => {
-        updateProgress('Testing latency...', 0);
-        const samples: number[] = [];
-        let failures = 0;
-        const count = 10;
-
-        for (let i = 0; i < count; i++) {
-            if (isAborted()) return;
-            try {
-                const start = performance.now();
-                await fetchWithTimeout(appendCacheBust(server.pingUrl), {
-                    method: 'GET', cache: 'no-store', mode: 'no-cors',
-                    signal: controllerRef.current?.signal,
-                });
-                const elapsed = performance.now() - start;
-                samples.push(elapsed);
-            } catch (err: unknown) {
-                if (isAbortError(err)) return;
-                failures++;
-            }
-            updateProgress(`Ping ${i + 1}/${count}`, ((i + 1) / count) * 20);
-            if (i < count - 1) {
-                try {
-                    await abortableDelay(150, controllerRef.current?.signal);
-                } catch (err: unknown) {
-                    if (isAbortError(err)) return;
-                    throw err;
-                }
-            }
-        }
-
-        const lossPercent = Math.round((failures / count) * 100);
-        setPacketLoss(lossPercent);
-        lossRef.current = lossPercent;
-
-        if (samples.length > 0) {
-            const trimmed = trimLatencySamples(samples);
-            const avg = averageSamples(trimmed);
-            if (avg === null) return;
-            const roundedPing = Math.round(avg);
-            setPing(roundedPing);
-            pingRef.current = roundedPing;
-            setPingQuality(getQualityClass(avg, [30, 100, 250], true));
-
-            const j = calculateJitterMs(trimmed);
-            if (j !== null) {
-                setJitter(j);
-                jitterRef.current = j;
-                setJitterQuality(getQualityClass(j, [10, 30, 50], true));
-            }
-        } else {
-            setPing(-1); setJitter(-1);
-            pingRef.current = -1; jitterRef.current = -1;
-        }
-    }, [server, updateProgress, isAborted]);
-
-    const runSpeedTest = useCallback(async (type: 'download' | 'upload') => {
-        const progressStart = type === 'download' ? 25 : 65;
-        const progressEnd = type === 'download' ? 60 : 95;
-        updateProgress(`Testing ${type}...`, progressStart);
-
-        const sizes = type === 'download'
-            ? [Math.floor(testSize.bytes * 0.25), Math.floor(testSize.bytes * 0.5), testSize.bytes]
-            : [Math.floor(testSize.bytes * 0.1), Math.floor(testSize.bytes * 0.25), Math.floor(testSize.bytes * 0.5)];
-
-        const speeds: number[] = [];
-        for (let round = 0; round < sizes.length; round++) {
-            if (isAborted()) return;
-            const size = sizes[round];
-            const url = type === 'download' ? server.downloadUrl(size) : server.uploadUrl(size);
-            try {
-                const start = performance.now();
-                const opts: RequestInit = { cache: 'no-store', signal: controllerRef.current?.signal };
-                if (type === 'upload') { opts.method = 'POST'; opts.body = new Blob([new Uint8Array(size)]); }
-                const response = await fetchWithTimeout(appendCacheBust(url), opts, SPEED_FETCH_TIMEOUT_MS);
-                if (type === 'download') await response.blob();
-                const duration = (performance.now() - start) / 1000;
-                if (duration > 0.01) speeds.push((size * 8) / (duration * 1e6));
-            } catch (err: unknown) {
-                if (isAbortError(err)) return;
-            }
-            const pct = progressStart + ((round + 1) / sizes.length) * (progressEnd - progressStart);
-            updateProgress(`${type} round ${round + 1}/${sizes.length}`, pct);
-        }
-
-        if (speeds.length > 0) {
-            const best = Math.max(...speeds);
-            const thresholds = type === 'download' ? [100, 50, 10] : [50, 20, 5];
-            if (type === 'download') {
-                setDownload(best); downloadRef.current = best;
-                setDownloadQuality(getQualityClass(best, thresholds, false));
-            } else {
-                setUpload(best); uploadRef.current = best;
-                setUploadQuality(getQualityClass(best, thresholds, false));
-            }
-        } else {
-            if (type === 'download') { setDownload(-1); downloadRef.current = -1; }
-            else { setUpload(-1); uploadRef.current = -1; }
-        }
-    }, [server, testSize, updateProgress, isAborted]);
-
     const runFullTest = useCallback(async () => {
         if (isTestingRef.current) return;
         isTestingRef.current = true;
         setIsTesting(true);
         controllerRef.current = new AbortController();
+        const signal = controllerRef.current.signal;
         setShowProgress(true);
         resetResults();
 
         try {
-            await runPingJitterTest();
-            if (controllerRef.current?.signal.aborted) return;
-            await runSpeedTest('download');
-            if (controllerRef.current?.signal.aborted) return;
-            await runSpeedTest('upload');
-            if (controllerRef.current?.signal.aborted) return;
+            const connectionDetailsPromise = loadConnectionDetails(signal);
+            const result = await runNetworkDiagnostic({
+                server,
+                testSizeBytes: testSize.bytes,
+                signal,
+                onProgress: progress => updateProgress(progress.text, progress.percent),
+            });
+            await connectionDetailsPromise;
+            if (!result || signal.aborted) return;
 
-            updateProgress('Complete', 100);
+            setPing(result.ping);
+            setJitter(result.jitter);
+            setDownload(result.download);
+            setUpload(result.upload);
+            setPacketLoss(result.packetLoss);
+            setPingQuality(result.pingQuality);
+            setJitterQuality(result.jitterQuality);
+            setDownloadQuality(result.downloadQuality);
+            setUploadQuality(result.uploadQuality);
+            setGrade(result.grade);
 
-            // Grade uses refs — always has the latest values, no nested setState needed
-            const p = pingRef.current, j = jitterRef.current;
-            const d = downloadRef.current, u = uploadRef.current, l = lossRef.current;
-            if (p > 0 && d > 0) {
-                const g = getGrade(p, j, d, u, l);
-                setGrade(g);
+            if (result.grade) {
                 setHistory(prev => [{
-                    timestamp: Date.now(), server: server.name,
-                    ping: p, jitter: j, download: parseFloat(d.toFixed(1)),
-                    upload: parseFloat(u.toFixed(1)), packetLoss: l, grade: g,
+                    timestamp: Date.now(),
+                    server: server.name,
+                    ping: result.ping,
+                    jitter: result.jitter,
+                    download: parseFloat(result.download.toFixed(1)),
+                    upload: parseFloat(result.upload.toFixed(1)),
+                    packetLoss: result.packetLoss,
+                    grade: result.grade,
                 }, ...prev].slice(0, 10));
             }
         } catch (err: unknown) {
@@ -289,13 +184,11 @@ export default function NetworkTester() {
         } finally {
             stopTest();
         }
-    }, [server, resetResults, runPingJitterTest, runSpeedTest, stopTest, updateProgress]);
+    }, [loadConnectionDetails, server, testSize.bytes, resetResults, stopTest, updateProgress]);
 
     useEffect(() => {
-        loadIpInfo();
-        loadTrace();
         return () => { controllerRef.current?.abort(); };
-    }, [loadIpInfo, loadTrace]);
+    }, []);
 
     const maxGauge = Math.max(download, upload, 100);
 

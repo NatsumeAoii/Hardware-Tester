@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getBattery, type BrowserBatteryManager } from '../lib/browserAdapters';
+import { readBatterySnapshot } from '../lib/deviceDiagnostics';
 import { EMPTY_VALUE, formatDurationFromSeconds } from '../lib/formatters';
 
 interface BatteryInfo {
@@ -34,12 +35,7 @@ export default function BatteryTester() {
 
         const updateBattery = (batt: BrowserBatteryManager) => {
             if (cancelled) return;
-            const info: BatteryInfo = {
-                charging: batt.charging,
-                level: batt.level,
-                chargingTime: batt.chargingTime,
-                dischargingTime: batt.dischargingTime,
-            };
+            const info: BatteryInfo = readBatterySnapshot(batt);
             setBattery(info);
             setHistory(prev => {
                 const now = new Date().toLocaleTimeString();

@@ -27,7 +27,7 @@ export default function BurnInFixer() {
     const startFix = useCallback(() => {
         const overlay = overlayRef.current;
         if (!overlay) return;
-        requestElementFullscreen(overlay).catch(() => { });
+        requestElementFullscreen(overlay).catch(() => { /* fullscreen is best-effort for the pixel fixer */ });
         activeRef.current = true;
         setIsActive(true);
         setElapsed(0);
@@ -91,7 +91,7 @@ export default function BurnInFixer() {
         cancelAnimationFrameIfSet(animRef.current);
         setIsActive(false);
         const exit = exitDocumentFullscreen();
-        if (exit) exit.catch(() => { });
+        if (exit) exit.catch(() => { /* fullscreen exit can be rejected after manual escape */ });
     }, []);
 
     useEffect(() => {

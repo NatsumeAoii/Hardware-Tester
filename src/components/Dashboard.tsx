@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useDeviceSpecs } from '../hooks/useDeviceSpecs';
-import { dashboardTesters, navIconPaths, techStack } from '../lib/testerRegistry';
+import { dashboardTesters, navIconPaths } from '../lib/testerRegistry';
 import CompatibilityMatrix from './dashboard/CompatibilityMatrix';
 
 const specSvgPaths: Record<string, string> = {
@@ -98,17 +98,6 @@ export default function Dashboard() {
 
             <CompatibilityMatrix />
 
-            <h2 className="dash-section-title">Tech Stack</h2>
-            <div className="dash-tech-stack">
-                {techStack.map(t => (
-                    <div key={t.name} className="tech-badge">
-                        <span className="tech-dot" style={{ background: t.color }} />
-                        <span className="tech-name">{t.name}</span>
-                        <span className="tech-version">{t.version}</span>
-                    </div>
-                ))}
-            </div>
-
             <h2 className="dash-section-title">Available Tests ({dashboardTesters.length})</h2>
             <div className="dash-features">
                 {dashboardTesters.map(test => (
@@ -139,7 +128,6 @@ export default function Dashboard() {
             </div>
 
             <footer className="dash-footer">
-                <p>Built with React &middot; TypeScript &middot; Vite &middot; Lightning CSS</p>
                 <p>&copy; {year} Hardware Diagnostic Suite. All rights reserved.</p>
             </footer>
 
@@ -169,19 +157,9 @@ export default function Dashboard() {
         .spec-card:hover { border-color: rgba(59,130,246,0.25); }
         .spec-card__svg { color: var(--text-muted); opacity: 0.5; flex-shrink: 0; }
         .spec-card__text { display: flex; flex-direction: column; min-width: 0; }
-        .spec-card__label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+        .spec-card__label { font-size: 0.625rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
         .spec-card__value { font-size: var(--text-sm); font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .spec-note-badge { cursor: help; font-size: 10px; color: var(--primary); opacity: 0.7; margin-left: 2px; font-style: normal; }
-        .dash-tech-stack { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2rem; }
-        .tech-badge {
-          display: flex; align-items: center; gap: 0.5rem;
-          background: var(--surface-2); border: 1px solid var(--border);
-          border-radius: 999px; padding: 0.4rem 1rem; font-size: var(--text-sm); transition: all var(--transition);
-        }
-        .tech-badge:hover { border-color: rgba(59,130,246,0.3); transform: translateY(-1px); }
-        .tech-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-        .tech-name { font-weight: 600; color: var(--text); }
-        .tech-version { color: var(--text-muted); font-family: var(--font-mono); font-size: var(--text-xs); }
+        .spec-note-badge { cursor: help; font-size: 0.625rem; color: var(--primary); opacity: 0.7; margin-left: 2px; font-style: normal; }
         .dash-features { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.6rem; margin-bottom: 2rem; }
         .dash-feature {
           background: linear-gradient(135deg, var(--surface-2), var(--surface-1));
@@ -197,7 +175,7 @@ export default function Dashboard() {
         .dash-feature:hover, .dash-feature:focus-visible { border-color: rgba(59,130,246,0.3); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
         .dash-feature__svg { color: var(--primary); opacity: 0.7; margin-bottom: 0.35rem; display: block; }
         .dash-feature h3 { font-size: var(--text-sm); font-weight: 600; margin-bottom: 0.15rem; }
-        .dash-feature p { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+        .dash-feature p { font-size: 0.6875rem; color: var(--text-muted); line-height: 1.4; }
         .dash-info-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
         .dash-info-card {
           background: linear-gradient(135deg, var(--surface-2), var(--surface-1));

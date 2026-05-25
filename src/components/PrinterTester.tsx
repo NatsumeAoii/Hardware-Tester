@@ -156,11 +156,11 @@ export default function PrinterTest() {
         }
         .print-header { text-align: center; margin-bottom: 1.5rem; border-bottom: 2px solid #000; padding-bottom: 1rem; }
         .print-header h2 { color: #000; font-size: 1.5rem; margin-bottom: 0.25rem; }
-        .print-header p { color: #666; font-size: 12px; }
+        .print-header p { color: #666; font-size: 0.75rem; }
         .print-section { margin-bottom: 1.5rem; break-inside: avoid; }
-        .print-section h3 { font-size: 14px; color: #000; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .print-section h3 { font-size: 0.875rem; color: #000; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
         .color-bars { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; }
-        .color-bar { padding: 1rem 0.5rem; text-align: center; font-size: 11px; font-weight: 600; }
+        .color-bar { padding: 1rem 0.5rem; text-align: center; font-size: 0.6875rem; font-weight: 600; }
         .gray-gradient { display: flex; }
         .gray-step { flex: 1; height: 40px; display: flex; align-items: center; justify-content: center; }
         .text-samples p { margin: 0.35rem 0; color: #000; }
@@ -169,15 +169,15 @@ export default function PrinterTest() {
         .grid-cell { aspect-ratio: 1; }
         .fine-lines { display: flex; flex-direction: column; gap: 0.75rem; }
         .fine-line-row { display: flex; align-items: center; gap: 0.5rem; }
-        .fine-line-row span { font-size: 11px; color: #000; width: 30px; }
+        .fine-line-row span { font-size: 0.6875rem; color: #000; width: 30px; }
         .fine-line { background: #000; width: 100%; }
         .saturation-row { display: flex; flex-direction: column; gap: 0.5rem; }
         .saturation-strip { display: flex; align-items: center; gap: 0.5rem; }
-        .saturation-strip > span { font-size: 11px; text-transform: uppercase; width: 40px; color: #000; font-weight: 600; }
+        .saturation-strip > span { font-size: 0.6875rem; text-transform: uppercase; width: 40px; color: #000; font-weight: 600; }
         .sat-cells { display: flex; flex: 1; }
         .sat-cell { flex: 1; height: 28px; display: flex; align-items: center; justify-content: center; }
         .print-footer { text-align: center; border-top: 1px solid #ccc; padding-top: 1rem; }
-        .print-footer p { font-size: 11px; color: #666; margin: 0.15rem 0; }
+        .print-footer p { font-size: 0.6875rem; color: #666; margin: 0.15rem 0; }
         @page { size: A4; margin: 10mm; }
         @media print {
           .no-print, .sidebar, .a11y-controls, .sidebar-open-btn, .tester-panel__header, .sidebar-backdrop { display: none !important; }

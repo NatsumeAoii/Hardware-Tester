@@ -104,7 +104,7 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: 100%;
   scroll-behavior: smooth;
 }
 
@@ -497,12 +497,7 @@ input[type="range"].slider::-webkit-slider-thumb:hover {
   }
 }
 
-/* ── Responsive ── */
-@media (max-width: 1200px) {
-  .tester-main-area {
-    grid-template-columns: 1fr !important;
-  }
-}
+/* Responsive */
 
 @media (max-width: 1024px) {
   :root {

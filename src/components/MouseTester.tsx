@@ -118,7 +118,7 @@ export default function MouseTester() {
         }
         .mouse-scroll-vis.active { background-color: var(--primary); border-color: var(--primary); }
         .mouse-scroll-vis.scrolling { background-color: var(--success); border-color: var(--success); box-shadow: 0 0 8px rgba(34, 197, 94, 0.4); }
-        .active-text { color: var(--primary) !important; }
+        .info-card p.active-text { color: var(--primary); }
       `}</style>
         </section>
     );

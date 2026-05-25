@@ -1,37 +1,25 @@
 import { useState, useMemo, useCallback } from 'react';
 import { printWhenFontsReady } from '../lib/browserAdapters';
 import { useDeviceSpecs } from '../hooks/useDeviceSpecs';
+import { reportGroups, reportTesterIds, testerById, type TesterId } from '../lib/testerRegistry';
 
 type TestStatus = 'pending' | 'pass' | 'fail' | 'skip';
 
-const ALL_TESTS = ['Keyboard', 'Mouse', 'Double Click', 'Gamepad', 'Touch', 'MIDI',
-    'Screen', 'Microphone', 'Sound', 'Webcam', 'Vibration',
-    'Battery', 'GPU', 'Motion', 'Geolocation', 'Light Sensor', 'Bluetooth',
-    'Network', 'Burn-in Fix', 'Print Test'];
-
-const TEST_GROUPS = [
-    { name: 'Input Devices', tests: ['Keyboard', 'Mouse', 'Double Click', 'Gamepad', 'Touch', 'MIDI'] },
-    { name: 'Output & Media', tests: ['Screen', 'Microphone', 'Sound', 'Webcam', 'Vibration'] },
-    { name: 'System & Sensors', tests: ['Battery', 'GPU', 'Motion', 'Geolocation', 'Light Sensor', 'Bluetooth'] },
-    { name: 'Network & Connectivity', tests: ['Network'] },
-    { name: 'Utilities', tests: ['Burn-in Fix', 'Print Test'] },
-];
-
 export default function SystemReport() {
     const { specs, battery, storage } = useDeviceSpecs();
-    const [results, setResults] = useState<Record<string, TestStatus>>({});
+    const [results, setResults] = useState<Partial<Record<TesterId, TestStatus>>>({});
     const [technicianName, setTechnicianName] = useState('');
     const [notes, setNotes] = useState('');
     const [reportDate] = useState(() => new Date().toLocaleString());
     const [refId] = useState(() => Math.random().toString(36).substr(2, 9).toUpperCase());
 
-    const setStatus = (testName: string, status: TestStatus) => {
-        setResults(prev => ({ ...prev, [testName]: status }));
+    const setStatus = (testerId: TesterId, status: TestStatus) => {
+        setResults(prev => ({ ...prev, [testerId]: status }));
     };
 
     const markAll = (status: TestStatus) => {
-        const next: Record<string, TestStatus> = {};
-        ALL_TESTS.forEach(t => next[t] = status);
+        const next: Partial<Record<TesterId, TestStatus>> = {};
+        reportTesterIds.forEach(testerId => next[testerId] = status);
         setResults(next);
     };
 
@@ -39,8 +27,8 @@ export default function SystemReport() {
 
     const summary = useMemo(() => {
         const counts = { pass: 0, fail: 0, skip: 0, pending: 0 };
-        ALL_TESTS.forEach(t => {
-            const s = results[t] || 'pending';
+        reportTesterIds.forEach(testerId => {
+            const s = results[testerId] || 'pending';
             counts[s]++;
         });
         return counts;
@@ -145,26 +133,31 @@ export default function SystemReport() {
                 <div className="rpt-section">
                     <h3>Diagnostic Results</h3>
                     <div className="rpt-results-grid">
-                        {TEST_GROUPS.map(group => (
+                        {reportGroups.map(group => (
                             <div key={group.name} className="rpt-result-group">
                                 <h4>{group.name}</h4>
                                 <table className="rpt-results-table">
                                     <thead><tr><th>Test Component</th><th>Status</th><th className="no-print">Action</th></tr></thead>
                                     <tbody>
-                                        {group.tests.map(test => (
-                                            <tr key={test} className={`rpt-row-${results[test] || 'pending'}`}>
-                                                <td className="rpt-test-name">{test}</td>
+                                        {group.testerIds.map(testerId => {
+                                            const tester = testerById.get(testerId);
+                                            const label = tester?.label ?? testerId;
+                                            const status = results[testerId] || 'pending';
+                                            return (
+                                            <tr key={testerId} className={`rpt-row-${status}`}>
+                                                <td className="rpt-test-name">{label}</td>
                                                 <td className="rpt-test-status">
-                                                    {getStatusIcon(results[test] || 'pending')}
-                                                    {getStatusLabel(results[test] || 'pending')}
+                                                    {getStatusIcon(status)}
+                                                    {getStatusLabel(status)}
                                                 </td>
                                                 <td className="rpt-test-actions no-print">
-                                                    <button type="button" className={`rpt-btn-status rpt-bst-pass ${results[test] === 'pass' ? 'active' : ''}`} onClick={() => setStatus(test, 'pass')} aria-label={`Mark ${test} as pass`} aria-pressed={results[test] === 'pass'} title="Pass">✓</button>
-                                                    <button type="button" className={`rpt-btn-status rpt-bst-fail ${results[test] === 'fail' ? 'active' : ''}`} onClick={() => setStatus(test, 'fail')} aria-label={`Mark ${test} as fail`} aria-pressed={results[test] === 'fail'} title="Fail">✗</button>
-                                                    <button type="button" className={`rpt-btn-status rpt-bst-skip ${results[test] === 'skip' ? 'active' : ''}`} onClick={() => setStatus(test, 'skip')} aria-label={`Mark ${test} as skip`} aria-pressed={results[test] === 'skip'} title="Skip">−</button>
+                                                    <button type="button" className={`rpt-btn-status rpt-bst-pass ${status === 'pass' ? 'active' : ''}`} onClick={() => setStatus(testerId, 'pass')} aria-label={`Mark ${label} as pass`} aria-pressed={status === 'pass'} title="Pass">✓</button>
+                                                    <button type="button" className={`rpt-btn-status rpt-bst-fail ${status === 'fail' ? 'active' : ''}`} onClick={() => setStatus(testerId, 'fail')} aria-label={`Mark ${label} as fail`} aria-pressed={status === 'fail'} title="Fail">✗</button>
+                                                    <button type="button" className={`rpt-btn-status rpt-bst-skip ${status === 'skip' ? 'active' : ''}`} onClick={() => setStatus(testerId, 'skip')} aria-label={`Mark ${label} as skip`} aria-pressed={status === 'skip'} title="Skip">−</button>
                                                 </td>
                                             </tr>
-                                        ))}
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             </div>
@@ -180,7 +173,7 @@ export default function SystemReport() {
                 </div>
 
                 <footer className="rpt-footer">
-                    <p>Generated by Hardware Diagnostic Suite &middot; https://github.com/wardana/hardware-diagnostic-suite</p>
+                    <p>Generated by Hardware Diagnostic Suite &middot; https://github.com/NatsumeAoii/Hardware-Tester</p>
                 </footer>
             </div>
 
@@ -268,7 +261,7 @@ export default function SystemReport() {
                 .rpt-btn-status {
                     width: 24px; height: 24px; border: 1px solid #ddd; background: white;
                     border-radius: 4px; cursor: pointer; color: #999; display: flex; align-items: center; justify-content: center;
-                    font-size: 14px;
+                    font-size: 0.875rem;
                 }
                 .rpt-btn-status:hover { background: #f5f5f5; }
                 .rpt-bst-pass.active { background: #16a34a; color: white; border-color: #16a34a; }

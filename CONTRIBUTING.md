@@ -50,7 +50,7 @@ npx playwright install chromium
 ## Code Organization
 
 - Register tester metadata in `src/lib/testerRegistry.ts`.
-- Wire tester components into `src/App.tsx`.
+- Wire tester components into `src/testerComponents.ts`.
 - Put reusable browser capability checks in `src/lib/hardwareCapabilities.ts`.
 - Put user-safe browser error messages in `src/lib/userSafeErrors.ts`.
 - Keep component-specific UI in `src/components/` unless the behavior is shared.
@@ -88,7 +88,7 @@ For manual checks, include the browser, operating system, device type, and any r
 
 - The change is scoped to one coherent problem.
 - Public route IDs and exported symbols are preserved.
-- New tester routes are added to both `src/lib/testerRegistry.ts` and `src/App.tsx`.
+- New tester routes are added to both `src/lib/testerRegistry.ts` and `src/testerComponents.ts`.
 - No secrets, tokens, captured reports, or device data are committed.
 - Type checking passes.
 - Unit tests pass.

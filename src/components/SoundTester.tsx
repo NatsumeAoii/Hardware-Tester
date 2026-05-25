@@ -23,7 +23,9 @@ export default function SoundTester() {
             oscillatorRef.current = null;
         }
         if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
-            void closeAudioContext(audioCtxRef.current).then(() => { audioCtxRef.current = null; });
+            void closeAudioContext(audioCtxRef.current)
+                .catch(() => { /* audio context cleanup is best-effort */ })
+                .finally(() => { audioCtxRef.current = null; });
         }
         gainNodeRef.current = null;
         isPlayingRef.current = false;

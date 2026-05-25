@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
+import { HardwareCapabilitiesProvider } from './hooks/useHardwareCapabilities';
 import { siteMeta } from './lib/siteMeta';
 import './app.css';
 
@@ -10,6 +11,8 @@ document.title = siteMeta.name;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        <App />
+        <HardwareCapabilitiesProvider>
+            <App />
+        </HardwareCapabilitiesProvider>
     </React.StrictMode>,
 );

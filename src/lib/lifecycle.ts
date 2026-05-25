@@ -21,14 +21,15 @@ export function createCleanupStack(): CleanupStack {
         },
         run() {
             const errors: unknown[] = [];
-            const pending = cleanups.splice(0).reverse();
-            for (const cleanup of pending) {
+            // Iterate in reverse without allocating a reversed copy
+            for (let i = cleanups.length - 1; i >= 0; i--) {
                 try {
-                    cleanup();
+                    cleanups[i]();
                 } catch (error) {
                     errors.push(error);
                 }
             }
+            cleanups.length = 0;
             return { errors };
         },
         size() {
@@ -45,17 +46,27 @@ const toAbortError = (reason: unknown) =>
 export function abortableDelay(ms: number, signal?: AbortSignal): Promise<void> {
     if (signal?.aborted) return Promise.reject(toAbortError(signal.reason));
 
+    // Fast path: no signal means no abort listener to manage
+    if (!signal) {
+        return new Promise<void>((resolve) => {
+            globalThis.setTimeout(resolve, Math.max(0, ms));
+        });
+    }
+
     let abort: (() => void) | null = null;
     return new Promise<void>((resolve, reject) => {
-        const timeoutId = globalThis.setTimeout(resolve, Math.max(0, ms));
+        const timeoutId = globalThis.setTimeout(() => {
+            abort = null;
+            resolve();
+        }, Math.max(0, ms));
         abort = () => {
             globalThis.clearTimeout(timeoutId);
-            reject(toAbortError(signal?.reason));
+            reject(toAbortError(signal.reason));
         };
 
-        signal?.addEventListener('abort', abort, { once: true });
+        signal.addEventListener('abort', abort, { once: true });
     }).finally(() => {
-        if (signal && abort) signal.removeEventListener('abort', abort);
+        if (abort) signal.removeEventListener('abort', abort);
     });
 }
 

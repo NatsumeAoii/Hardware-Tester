@@ -28,7 +28,7 @@ const routeNeedles: Partial<Record<TesterMeta['id'], string>> = {
     printer: 'Printer Test Page',
 };
 
-async function blockExternalRequests(page: Page) {
+async function blockExternalRequests(page: Page, externalRequests: string[] = []) {
     await page.route('**/*', route => {
         const requestUrl = new URL(route.request().url());
         if (requestUrl.protocol === 'data:' || appHosts.has(requestUrl.hostname)) {
@@ -36,6 +36,7 @@ async function blockExternalRequests(page: Page) {
             return;
         }
 
+        externalRequests.push(route.request().url());
         route.abort();
     });
 }
@@ -55,6 +56,20 @@ test('dashboard exposes the primary landmarks and keyboard skip path', async ({ 
     await expect(page.getByRole('link', { name: /Skip to main content/i })).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(page.getByRole('main')).toBeFocused();
+});
+
+test('sidebar exposes support links below the utility navigation', async ({ page }) => {
+    await page.goto('/');
+
+    const supportLinks = page.locator('.sidebar__support');
+    await expect(supportLinks).toBeVisible();
+    await expect(supportLinks).toContainText('GitHub repo');
+    await expect(supportLinks).toContainText('Report a bug');
+    await expect(supportLinks).not.toContainText('Credit');
+    await expect(page.locator('body')).not.toContainText('Hardware Diagnostic Suite contributors');
+    await expect(page.locator('body')).not.toContainText('Credit');
+    await expect(page.getByRole('link', { name: /GitHub repo/i })).toHaveAttribute('href', 'https://github.com/NatsumeAoii/Hardware-Tester');
+    await expect(page.getByRole('link', { name: /Report a bug/i })).toHaveAttribute('href', 'https://github.com/NatsumeAoii/Hardware-Tester/issues');
 });
 
 test('invalid hashes are repaired to the dashboard route', async ({ page }) => {
@@ -101,4 +116,51 @@ test('printer route keeps exact color print rendering enabled', async ({ page })
     });
 
     expect(printColorAdjust.trim()).toBe('exact');
+});
+
+test('network route does not contact third-party endpoints before user action', async ({ page }) => {
+    const externalRequests: string[] = [];
+    await page.unroute('**/*');
+    await blockExternalRequests(page, externalRequests);
+
+    await page.goto('/#network');
+    await expect(page.getByRole('heading', { name: /Network Diagnostic/i })).toBeVisible();
+    await page.waitForTimeout(500);
+
+    const diagnosticRequests = externalRequests.filter(url =>
+        /cloudflare|ipwho\.is|ipapi\.co|api\.ipify\.org|google\.com|apple\.com|firefox\.com/.test(url),
+    );
+    expect(diagnosticRequests).toEqual([]);
+});
+
+test('dashboard avoids duplicate WebGL capability probes on initial render', async ({ page }) => {
+    await page.addInitScript(() => {
+        const counters = { canvasCreates: 0, webglContextRequests: 0 };
+        Object.defineProperty(window, '__hardwarePerfCounters', { value: counters });
+        const originalCreateElement = Document.prototype.createElement;
+        Document.prototype.createElement = function createElement(tagName, options) {
+            const element = originalCreateElement.call(this, tagName, options);
+            if (String(tagName).toLowerCase() === 'canvas') {
+                counters.canvasCreates += 1;
+                const canvas = element as HTMLCanvasElement;
+                const originalGetContext = canvas.getContext;
+                canvas.getContext = function getContext(contextId: string, contextAttributes?: unknown) {
+                    if (contextId === 'webgl' || contextId === 'webgl2') counters.webglContextRequests += 1;
+                    return originalGetContext.call(this, contextId as never, contextAttributes as never);
+                } as HTMLCanvasElement['getContext'];
+            }
+            return element;
+        };
+    });
+
+    await page.goto('/#dashboard');
+    await expect(page.getByRole('heading', { name: /Hardware Diagnostic Suite/i })).toBeVisible();
+    await page.waitForTimeout(500);
+
+    const counters = await page.evaluate(() => window.__hardwarePerfCounters as {
+        canvasCreates: number;
+        webglContextRequests: number;
+    });
+
+    expect(counters.webglContextRequests).toBeLessThanOrEqual(3);
 });

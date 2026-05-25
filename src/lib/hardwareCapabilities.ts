@@ -8,6 +8,11 @@ type NavigatorWithHardware = Navigator & {
     bluetooth?: unknown;
     connection?: unknown;
     getBattery?: () => Promise<unknown>;
+    hid?: unknown;
+    serial?: unknown;
+    wakeLock?: unknown;
+    storage?: { estimate?: () => Promise<unknown> };
+    clipboard?: unknown;
     userAgentData?: {
         mobile?: boolean;
         platform?: string;
@@ -21,7 +26,9 @@ interface HardwareGlobal extends Window {
     DeviceOrientationEvent?: unknown;
     KeyboardEvent?: unknown;
     MIDIInput?: unknown;
+    NDEFReader?: unknown;
     webkitAudioContext?: unknown;
+    getScreenDetails?: () => Promise<unknown>;
 }
 
 export interface DeviceProfile {
@@ -66,14 +73,26 @@ const getNavigator = (scope: HardwareGlobal): NavigatorWithHardware =>
 
 const canUseDom = (scope: HardwareGlobal) => typeof scope.document !== 'undefined';
 const isCallable = (value: unknown): value is (...args: never[]) => unknown => typeof value === 'function';
+const canvasContextSupportCache = new WeakMap<object, Map<'webgl' | 'webgl2', boolean>>();
 
 const canCreateCanvasContext = (scope: HardwareGlobal, contextId: 'webgl' | 'webgl2') => {
     if (!canUseDom(scope)) return false;
+    const cacheKey = scope.document ?? scope;
+    let cache = canvasContextSupportCache.get(cacheKey);
+    if (!cache) {
+        cache = new Map();
+        canvasContextSupportCache.set(cacheKey, cache);
+    }
+    const cached = cache.get(contextId);
+    if (cached !== undefined) return cached;
+
     try {
         const canvas = scope.document.createElement('canvas');
         const context = canvas.getContext(contextId) as WebGLRenderingContext | WebGL2RenderingContext | null;
         context?.getExtension('WEBGL_lose_context')?.loseContext();
-        return !!context;
+        const supported = !!context;
+        cache.set(contextId, supported);
+        return supported;
     } catch {
         return false;
     }
@@ -300,6 +319,71 @@ export const hardwareCapabilities: HardwareCapabilityDescriptor[] = [
         platform: 'all',
         fallback: 'Storage quota can still be inspected through browser developer tools.',
         isSupported: (_scope, navigatorRef) => typeof navigatorRef.storage?.estimate === 'function',
+    },
+    {
+        id: 'storage-api',
+        label: 'Storage API',
+        testerId: 'usb-storage',
+        platform: 'all',
+        fallback: 'Use browser developer tools to inspect storage quota and usage.',
+        isSupported: (_scope, navigatorRef) => typeof navigatorRef.storage?.estimate === 'function',
+    },
+    {
+        id: 'window-management',
+        label: 'Window Management',
+        testerId: 'multi-monitor',
+        platform: 'desktop',
+        secureContextRequired: true,
+        permissionRequired: true,
+        fallback: 'Use Chrome or Edge on desktop with the Window Management permission enabled.',
+        isSupported: scope => isCallable(scope.getScreenDetails),
+    },
+    {
+        id: 'web-nfc',
+        label: 'Web NFC',
+        testerId: 'nfc',
+        platform: 'mobile',
+        secureContextRequired: true,
+        permissionRequired: true,
+        fallback: 'Use Chrome for Android over HTTPS to access NFC hardware.',
+        isSupported: scope => isCallable(scope.NDEFReader),
+    },
+    {
+        id: 'web-hid',
+        label: 'WebHID',
+        testerId: 'serial-hid',
+        platform: 'desktop',
+        secureContextRequired: true,
+        permissionRequired: true,
+        fallback: 'Use Chrome or Edge on desktop with WebHID permission enabled.',
+        isSupported: (_scope, navigatorRef) => !!navigatorRef.hid,
+    },
+    {
+        id: 'clipboard',
+        label: 'Clipboard',
+        testerId: 'clipboard',
+        platform: 'all',
+        secureContextRequired: true,
+        permissionRequired: true,
+        fallback: 'Check clipboard permissions in browser settings or use keyboard shortcuts.',
+        isSupported: (_scope, navigatorRef) => !!navigatorRef.clipboard,
+    },
+    {
+        id: 'wake-lock',
+        label: 'Wake Lock',
+        testerId: 'wake-lock',
+        platform: 'all',
+        secureContextRequired: true,
+        fallback: 'Use operating system power settings to prevent screen dimming.',
+        isSupported: (_scope, navigatorRef) => !!navigatorRef.wakeLock,
+    },
+    {
+        id: 'perf-timing',
+        label: 'High-res timing',
+        testerId: 'benchmark',
+        platform: 'all',
+        fallback: 'High-resolution timing may be limited by browser privacy mitigations.',
+        isSupported: scope => typeof scope.performance?.now === 'function',
     },
 ];
 

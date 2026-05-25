@@ -3,10 +3,12 @@ node_modules/
 
 # Build output and caches
 dist/
+build/
 .vite/
 coverage/
 playwright-report/
 test-results/
+*.tsbuildinfo
 
 # Local environment files
 .env

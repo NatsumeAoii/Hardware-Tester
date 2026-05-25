@@ -220,7 +220,7 @@ export default function GamepadTester() {
         .gp-btn__index { font-size: var(--text-xs); font-weight: 600; color: var(--text-muted); }
         .gp-btn__bar { width: 24px; height: 32px; background: var(--surface-3); border-radius: 3px; overflow: hidden; display: flex; align-items: flex-end; }
         .gp-btn__fill { width: 100%; background: var(--primary); transition: height 16ms linear; border-radius: 3px; }
-        .gp-btn__val { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+        .gp-btn__val { font-family: var(--font-mono); font-size: 0.625rem; color: var(--text-muted); }
       `}</style>
         </section>
     );

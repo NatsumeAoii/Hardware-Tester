@@ -157,7 +157,7 @@ export default function TouchTester() {
           display: flex; align-items: center; justify-content: center;
           animation: fadeSlideIn 0.15s ease-out;
         }
-        .touch-point__id { font-size: 11px; font-weight: 700; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
+        .touch-point__id { font-size: 0.6875rem; font-weight: 700; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
         .touch-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: var(--text-sm); opacity: 0.5; }
         .status-inline { color: var(--text-muted); font-size: var(--text-sm); font-family: var(--font-mono); }
       `}</style>

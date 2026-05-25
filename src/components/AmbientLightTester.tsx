@@ -8,6 +8,7 @@ import {
 
 export default function AmbientLightTester() {
     const [isSupported, setIsSupported] = useState(true);
+    const [isRunning, setIsRunning] = useState(false);
     const [lux, setLux] = useState<number | null>(null);
     const [maxLux, setMaxLux] = useState(0);
     const [minLux, setMinLux] = useState(Infinity);
@@ -29,59 +30,69 @@ export default function AmbientLightTester() {
         return { label: 'Direct Sun', color: '#ef4444' };
     }, []);
 
-    useEffect(() => {
-        let als: AmbientLightSensorLike | null = null;
-        let prox: ProximitySensorLike | null = null;
-
-        const initALS = async () => {
-            try {
-                const ALS = getAmbientLightSensorConstructor();
-                if (ALS) {
-                    als = new ALS();
-                    als.addEventListener('reading', () => {
-                        if (!als) return;
-                        const val = Number.isFinite(als.illuminance) ? als.illuminance : 0;
-                        setLux(val);
-                        setMaxLux(p => Math.max(p, val));
-                        setMinLux(p => Math.min(p, val));
-                        setLuxHistory(prev => [...prev, val].slice(-100));
-                    });
-                    als.addEventListener('error', () => setIsSupported(false));
-                    als.start();
-                    sensorRef.current = als;
-                } else {
-                    setIsSupported(false);
-                }
-            } catch {
-                setIsSupported(false);
-            }
-        };
-
-        const initProximity = () => {
-            try {
-                const PS = getProximitySensorConstructor();
-                if (PS) {
-                    prox = new PS();
-                    prox.addEventListener('reading', () => {
-                        if (!prox) return;
-                        setProxNear(typeof prox.near === 'boolean' ? prox.near : null);
-                        setProxMax(typeof prox.max === 'number' && Number.isFinite(prox.max) ? prox.max : null);
-                        setProxDistance(typeof prox.distance === 'number' && Number.isFinite(prox.distance) ? prox.distance : null);
-                    });
-                    prox.start();
-                    proxRef.current = prox;
-                }
-            } catch { /* sensor not available */ }
-        };
-
-        initALS();
-        initProximity();
-
-        return () => {
-            if (sensorRef.current) try { sensorRef.current.stop(); } catch { /* */ }
-            if (proxRef.current) try { proxRef.current.stop(); } catch { /* */ }
-        };
+    const stopSensors = useCallback(() => {
+        if (sensorRef.current) try { sensorRef.current.stop(); } catch { /* sensor already stopped */ }
+        if (proxRef.current) try { proxRef.current.stop(); } catch { /* sensor already stopped */ }
+        sensorRef.current = null;
+        proxRef.current = null;
+        setIsRunning(false);
     }, []);
+
+    const startSensors = useCallback(() => {
+        stopSensors();
+        setIsSupported(true);
+        setLux(null);
+        setMaxLux(0);
+        setMinLux(Infinity);
+        setLuxHistory([]);
+        setProxNear(null);
+        setProxMax(null);
+        setProxDistance(null);
+
+        try {
+            const ALS = getAmbientLightSensorConstructor();
+            if (!ALS) {
+                setIsSupported(false);
+                return;
+            }
+
+            const als = new ALS();
+            als.addEventListener('reading', () => {
+                const val = Number.isFinite(als.illuminance) ? als.illuminance : 0;
+                setLux(val);
+                setMaxLux(p => Math.max(p, val));
+                setMinLux(p => Math.min(p, val));
+                setLuxHistory(prev => [...prev, val].slice(-100));
+            });
+            als.addEventListener('error', () => {
+                setIsSupported(false);
+                stopSensors();
+            });
+            als.start();
+            sensorRef.current = als;
+            setIsRunning(true);
+        } catch {
+            setIsSupported(false);
+            stopSensors();
+            return;
+        }
+
+        try {
+            const PS = getProximitySensorConstructor();
+            if (PS) {
+                const prox = new PS();
+                prox.addEventListener('reading', () => {
+                    setProxNear(typeof prox.near === 'boolean' ? prox.near : null);
+                    setProxMax(typeof prox.max === 'number' && Number.isFinite(prox.max) ? prox.max : null);
+                    setProxDistance(typeof prox.distance === 'number' && Number.isFinite(prox.distance) ? prox.distance : null);
+                });
+                prox.start();
+                proxRef.current = prox;
+            }
+        } catch { /* optional proximity sensor not available */ }
+    }, [stopSensors]);
+
+    useEffect(() => stopSensors, [stopSensors]);
 
     const lightInfo = lux !== null ? getLightLevel(lux) : null;
 
@@ -92,6 +103,11 @@ export default function AmbientLightTester() {
                 <p>Read ambient light sensor data and proximity detection. Requires a compatible device and browser (Chrome with flags enabled).</p>
             </header>
             <div className="tester-panel__body">
+                <div className="controls-bar">
+                    <button className="btn btn--primary" onClick={startSensors} disabled={isRunning}>Start Sensors</button>
+                    <button className="btn" onClick={stopSensors} disabled={!isRunning}>Stop</button>
+                    <span className="status-inline" role="status">{isRunning ? 'Reading sensors...' : 'Idle'}</span>
+                </div>
                 {!isSupported ? (
                     <div className="als-not-supported">
                         <div className="status-display" style={{ color: 'var(--warning)' }}>
@@ -108,6 +124,8 @@ export default function AmbientLightTester() {
                             <p>This sensor is also only available on devices with a physical light sensor (most laptops and all phones).</p>
                         </div>
                     </div>
+                ) : !isRunning ? (
+                    <div className="status-display">Start sensors to read ambient light and proximity data.</div>
                 ) : (
                     <>
                         {lightInfo && lux !== null && (
@@ -189,6 +207,7 @@ export default function AmbientLightTester() {
           overflow: hidden; padding: 0.5rem;
         }
         .als-chart__svg { width: 100%; height: 100%; }
+        .status-inline { color: var(--text-muted); font-size: var(--text-sm); font-family: var(--font-mono); }
       `}</style>
         </section>
     );

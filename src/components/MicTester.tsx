@@ -81,7 +81,7 @@ export default function MicTester() {
 
         stopMediaStream(streamRef.current);
         streamRef.current = null;
-        void closeAudioContext(audioCtxRef.current);
+        void closeAudioContext(audioCtxRef.current).catch(() => { /* audio context cleanup is best-effort */ });
         audioCtxRef.current = null;
         analyserRef.current = null;
 
@@ -130,7 +130,7 @@ export default function MicTester() {
         } catch (err: unknown) {
             stopMediaStream(streamRef.current);
             streamRef.current = null;
-            void closeAudioContext(audioCtxRef.current).catch(() => { });
+            void closeAudioContext(audioCtxRef.current).catch(() => { /* audio context cleanup is best-effort */ });
             audioCtxRef.current = null;
             analyserRef.current = null;
             isTestingRef.current = false;

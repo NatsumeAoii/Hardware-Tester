@@ -112,7 +112,6 @@ export default function MidiTester() {
     }, [isSupported, handleMidiMessage]);
 
     useEffect(() => {
-        connectMidi();
         return () => {
             if (accessRef.current) {
                 accessRef.current.onstatechange = null;
@@ -121,7 +120,7 @@ export default function MidiTester() {
                 });
             }
         };
-    }, [connectMidi]);
+    }, []);
 
     const clearLog = useCallback(() => { setMessages([]); setMsgCount(0); }, []);
 
@@ -145,6 +144,9 @@ export default function MidiTester() {
                 </div>
 
                 <div className="controls-bar">
+                    <button className="btn btn--primary" onClick={connectMidi} disabled={!isSupported || status.phase === 'loading'}>
+                        {status.phase === 'loading' ? 'Connecting...' : 'Connect MIDI'}
+                    </button>
                     <span className="status-inline" role="status">{getDiagnosticMessage(status)}</span>
                     <button className="btn" onClick={clearLog} disabled={messages.length === 0}>Clear Log</button>
                 </div>

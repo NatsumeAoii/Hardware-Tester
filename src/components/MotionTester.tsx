@@ -73,13 +73,9 @@ export default function MotionTester() {
             setIsSupported(false);
             return;
         }
-        if (getMotionPermissionApis().length > 0) {
-            setPermissionNeeded(true);
-        } else {
-            startListening();
-        }
+        setPermissionNeeded(getMotionPermissionApis().length > 0);
         return () => { stopListening(); };
-    }, [startListening, stopListening]);
+    }, [stopListening]);
 
     useEffect(() => {
         if (cubeRef.current) {
