@@ -26,8 +26,8 @@
     "react-dom": "^19.2.6"
   },
   "engines": {
-    "node": ">=22.0.0",
-    "npm": ">=10.0.0"
+    "node": ">=24.0.0",
+    "npm": ">=11.0.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",

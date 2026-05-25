@@ -8,8 +8,8 @@ const read = (path) => readFileSync(join(root, path), 'utf8');
 const packageJson = JSON.parse(read('package.json'));
 assert.equal(packageJson.description, 'Browser-based hardware diagnostics for desktop and mobile devices.');
 assert.equal(packageJson.license, 'MIT');
-assert.equal(packageJson.engines.node, '>=22.0.0');
-assert.equal(packageJson.engines.npm, '>=10.0.0');
+assert.equal(packageJson.engines.node, '>=24.0.0');
+assert.equal(packageJson.engines.npm, '>=11.0.0');
 assert.equal(packageJson.scripts.test, 'vitest run');
 assert.equal(packageJson.scripts['test:smoke'], 'node scripts/frontend-smoke.mjs');
 assert.equal(packageJson.scripts['test:e2e'], 'playwright test');
@@ -334,7 +334,7 @@ for (const componentPath of [
 }
 
 const workflow = read('.github/workflows/deploy.yml');
-assert.match(workflow, /node-version:\s*22/, 'CI must use a Node version compatible with Vite 8');
+assert.match(workflow, /node-version:\s*24/, 'CI must use a Node version compatible with the lock file');
 assert.match(workflow, /npm test/, 'CI must run unit tests');
 assert.match(workflow, /npm run test:smoke/, 'CI must run frontend smoke tests');
 assert.match(workflow, /playwright install --with-deps chromium/, 'CI must install the Chromium browser for e2e tests');
