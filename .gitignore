@@ -25,6 +25,7 @@ pnpm-debug.log*
 # Editor and OS metadata
 .vscode/
 .idea/
+.kiro/
 .DS_Store
 Thumbs.db
 
