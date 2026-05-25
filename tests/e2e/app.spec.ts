@@ -3,7 +3,7 @@ import { testers, type TesterMeta } from '../../src/lib/testerRegistry';
 
 const appHosts = new Set(['127.0.0.1', 'localhost']);
 
-const routeNeedles: Partial<Record<TesterMeta['id'], string>> = {
+const routeHeadings = {
     dashboard: 'Hardware Diagnostic Suite',
     report: 'System Diagnostic Report',
     keyboard: 'Keyboard Tester',
@@ -26,7 +26,14 @@ const routeNeedles: Partial<Record<TesterMeta['id'], string>> = {
     network: 'Network Diagnostic',
     'burn-in': 'Burn-in / Stuck Pixel Fixer',
     printer: 'Printer Test Page',
-};
+    'usb-storage': 'USB/Storage',
+    'multi-monitor': 'Multi-Monitor',
+    nfc: 'NFC Reader',
+    'serial-hid': 'Serial/HID Tester',
+    clipboard: 'Clipboard',
+    'wake-lock': 'Wake Lock',
+    benchmark: 'Performance Benchmark',
+} satisfies Record<TesterMeta['id'], string>;
 
 async function blockExternalRequests(page: Page, externalRequests: string[] = []) {
     await page.route('**/*', route => {
@@ -79,12 +86,19 @@ test('invalid hashes are repaired to the dashboard route', async ({ page }) => {
     await expect(page.getByRole('heading', { name: /Hardware Diagnostic Suite/i })).toBeVisible();
 });
 
+test('route heading expectations cover every registered tester', () => {
+    const expectedIds = Object.keys(routeHeadings).sort();
+    const registeredIds = testers.map(tester => tester.id).sort();
+
+    expect(expectedIds).toEqual(registeredIds);
+});
+
 for (const tester of testers) {
     test(`renders ${tester.id} route`, async ({ page }) => {
         await page.goto(`/#${tester.id}`);
 
         await expect(page).toHaveURL(new RegExp(`#${tester.id}$`));
-        await expect(page.getByRole('main')).toContainText(routeNeedles[tester.id] ?? tester.label);
+        await expect(page.getByRole('heading', { name: routeHeadings[tester.id], exact: true })).toBeVisible();
     });
 }
 

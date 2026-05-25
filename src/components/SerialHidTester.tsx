@@ -210,7 +210,7 @@ export default function SerialHidTester() {
     return (
         <section aria-labelledby="serial-hid-title">
             <header className="tester-panel__header">
-                <h2 id="serial-hid-title">Serial / HID Tester</h2>
+                <h2 id="serial-hid-title">Serial/HID Tester</h2>
                 <p>Connect to HID devices or serial ports for raw device communication.</p>
             </header>
             <div className="tester-panel__body">
