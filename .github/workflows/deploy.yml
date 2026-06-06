@@ -31,6 +31,7 @@ jobs:
         run: npm ci
 
       - name: Audit dependencies
+        # Advisory only — non-blocking to avoid failing deploys on upstream advisories
         run: npm audit --audit-level=moderate
         continue-on-error: true
 
@@ -51,7 +52,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
 
       - name: Install Playwright browser
         if: steps.playwright-cache.outputs.cache-hit != 'true'
