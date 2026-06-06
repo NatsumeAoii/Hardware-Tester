@@ -71,7 +71,7 @@ On a fresh machine, install the Chromium browser used by Playwright once:
 npx playwright install chromium
 ```
 
-The GitHub Actions workflow installs Chromium with system dependencies by running `npx playwright install --with-deps chromium`.
+On a Playwright browser cache miss, the GitHub Actions workflow installs Chromium with system dependencies by running `npx playwright install --with-deps chromium`.
 
 ## Verification
 

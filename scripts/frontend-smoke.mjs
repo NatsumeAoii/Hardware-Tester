@@ -342,6 +342,7 @@ assert.match(workflow, /node-version:\s*24/, 'CI must use a Node version compati
 assert.match(workflow, /npm test/, 'CI must run unit tests');
 assert.match(workflow, /npm run test:smoke/, 'CI must run frontend smoke tests');
 assert.match(workflow, /playwright install --with-deps chromium/, 'CI must install the Chromium browser for e2e tests');
+assert.doesNotMatch(workflow, /playwright install-deps chromium/, 'CI must not run a separate Playwright system dependency install');
 assert.match(workflow, /npm run test:e2e/, 'CI must run browser route tests');
 assert.match(workflow, /npm audit --audit-level=moderate/, 'CI must run dependency audit');
 
