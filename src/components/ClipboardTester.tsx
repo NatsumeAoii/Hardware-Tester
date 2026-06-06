@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getUserSafeError } from '../lib/userSafeErrors';
+import { queryPermissionState } from '../lib/permissions';
 
 type PermissionState = 'granted' | 'denied' | 'prompt';
 
@@ -16,20 +17,18 @@ export default function ClipboardTester() {
     const queryPermissions = useCallback(async () => {
         if (!isSupported) return;
         try {
-            const readStatus = await navigator.permissions.query({ name: 'clipboard-read' as PermissionName });
-            setReadPermission(readStatus.state as PermissionState);
-            readStatus.addEventListener('change', () => {
-                setReadPermission(readStatus.state as PermissionState);
-            });
+            const readState = await queryPermissionState('clipboard-read');
+            if (readState !== 'unsupported' && readState !== 'unknown') {
+                setReadPermission(readState as PermissionState);
+            }
         } catch {
             setReadPermission(null);
         }
         try {
-            const writeStatus = await navigator.permissions.query({ name: 'clipboard-write' as PermissionName });
-            setWritePermission(writeStatus.state as PermissionState);
-            writeStatus.addEventListener('change', () => {
-                setWritePermission(writeStatus.state as PermissionState);
-            });
+            const writeState = await queryPermissionState('clipboard-write');
+            if (writeState !== 'unsupported' && writeState !== 'unknown') {
+                setWritePermission(writeState as PermissionState);
+            }
         } catch {
             setWritePermission(null);
         }

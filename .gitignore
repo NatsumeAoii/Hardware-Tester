@@ -32,6 +32,7 @@ pnpm-debug.log*
 .vscode/
 .idea/
 .kiro/
+.worktrees/
 .DS_Store
 Thumbs.db
 
@@ -39,3 +40,7 @@ Thumbs.db
 *.local
 *.tmp
 *.temp
+dev/
+temp/
+tmp/
+scratch/

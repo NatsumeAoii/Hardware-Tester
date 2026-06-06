@@ -31,19 +31,38 @@ export default function WebcamTester() {
 
     const startWebcam = async () => {
         if (isActiveRef.current) return;
+        isActiveRef.current = true;
+        setIsActive(true);
         let stream: MediaStream | null = null;
         try {
             setCameraStatus('Starting...');
-            await throwIfPermissionDenied('camera' as PermissionName, 'Camera');
+            await throwIfPermissionDenied('camera', 'Camera');
+
+            if (!isActiveRef.current) {
+                return;
+            }
+
             stream = await requestUserMedia({
                 video: { width: { ideal: 1280 }, height: { ideal: 720 } }
             });
+
+            if (!isActiveRef.current) {
+                stopMediaStream(stream);
+                return;
+            }
+
             streamRef.current = stream;
             if (videoRef.current) {
                 await attachStreamToVideo(videoRef.current, stream);
             }
-            isActiveRef.current = true;
-            setIsActive(true);
+
+            if (!isActiveRef.current) {
+                stopMediaStream(stream);
+                streamRef.current = null;
+                clearVideoSource(videoRef.current);
+                return;
+            }
+
             setCameraStatus('Active');
 
             const settings = getVideoTrackSettings(stream);
@@ -120,11 +139,9 @@ export default function WebcamTester() {
 
     useEffect(() => {
         return () => {
-            if (isActiveRef.current) {
-                cancelAnimationFrameIfSet(requestRef.current);
-                stopMediaStream(streamRef.current);
-            }
+            stopWebcam();
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

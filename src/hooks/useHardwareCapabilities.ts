@@ -2,7 +2,6 @@ import { createContext, createElement, useContext, useEffect, useMemo, useState,
 import {
     detectHardwareCapabilities,
     getCompatibilityScore,
-    getDeviceProfile,
     type DeviceProfile,
     type HardwareCapabilityResult,
 } from '../lib/hardwareCapabilities';
@@ -21,14 +20,19 @@ let cachedSnapshot: HardwareCompatibilitySnapshot | null = null;
 const readHardwareCompatibility = (force = false): HardwareCompatibilitySnapshot => {
     if (!force && cachedSnapshot) return cachedSnapshot;
 
-    const capabilities = detectHardwareCapabilities();
-    const profile = getDeviceProfile();
+    const { results: capabilities, profile } = detectHardwareCapabilities();
+
+    let availableCount = 0;
+    for (let i = 0; i < capabilities.length; i++) {
+        const status = capabilities[i].status;
+        if (status === 'available' || status === 'permission') availableCount++;
+    }
 
     cachedSnapshot = {
         capabilities,
         profile,
         score: getCompatibilityScore(capabilities),
-        availableCount: capabilities.filter(capability => capability.status === 'available' || capability.status === 'permission').length,
+        availableCount,
         totalCount: capabilities.length,
     };
 
@@ -47,7 +51,7 @@ function useHardwareCapabilitiesSnapshot(shouldSubscribe = true) {
             debounceTimer = setTimeout(() => {
                 debounceTimer = null;
                 setSnapshot(readHardwareCompatibility(true));
-            }, 250);
+            }, 500);
         };
         const refreshOnVisible = () => {
             if (document.visibilityState === 'visible') debouncedRefresh();

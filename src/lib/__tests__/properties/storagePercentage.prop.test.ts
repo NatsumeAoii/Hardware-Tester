@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { computePercentage } from '../../../components/UsbStorageTester';
+import { computePercentage } from '../../displayLayout';
 
 /**
  * Property 1: Storage percentage calculation

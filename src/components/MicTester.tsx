@@ -28,6 +28,7 @@ export default function MicTester() {
     const isTestingRef = useRef(false);
 
     const visualize = useCallback(() => {
+        if (!isTestingRef.current) return;
         if (!analyserRef.current || !canvasRef.current) return;
 
         const analyser = analyserRef.current;
@@ -102,9 +103,19 @@ export default function MicTester() {
 
     const startTest = useCallback(async () => {
         if (isTestingRef.current) return;
+        isTestingRef.current = true;
+        setIsTesting(true);
+        setStatus('Starting microphone…');
         try {
-            await throwIfPermissionDenied('microphone' as PermissionName, 'Microphone');
+            await throwIfPermissionDenied('microphone', 'Microphone');
             const stream = await requestUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+
+            // Guard: detect stop-during-start
+            if (!isTestingRef.current) {
+                stopMediaStream(stream);
+                return;
+            }
+
             streamRef.current = stream;
 
             const audioCtx = createAudioContext();
@@ -116,8 +127,6 @@ export default function MicTester() {
             source.connect(analyser);
             analyserRef.current = analyser;
 
-            isTestingRef.current = true;
-            setIsTesting(true);
             setStatus('Listening — speak into your microphone');
 
             const settings = getAudioTrackSettings(stream);

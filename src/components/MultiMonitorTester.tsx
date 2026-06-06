@@ -1,66 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getUserSafeError, isAbortError } from '../lib/userSafeErrors';
-
-export interface ScreenInfo {
-    label: string;
-    width: number;
-    height: number;
-    left: number;
-    top: number;
-    devicePixelRatio: number;
-    isPrimary: boolean;
-}
+import { computeLayoutRects, type ScreenInfo } from '../lib/displayLayout';
 
 interface MonitorDisplayState {
     screens: ScreenInfo[];
     loading: boolean;
     error: string | null;
     permissionDenied: boolean;
-}
-
-/**
- * Computes the layout rectangles for the visual diagram.
- * Each screen is positioned proportionally to its left/top offset,
- * and scaled proportionally to its resolution relative to other screens.
- */
-export function computeLayoutRects(
-    screens: ScreenInfo[],
-    containerWidth: number,
-    containerHeight: number,
-): { left: number; top: number; width: number; height: number; index: number }[] {
-    if (screens.length === 0) return [];
-
-    // Find bounding box of all screens
-    let minLeft = Infinity;
-    let minTop = Infinity;
-    let maxRight = -Infinity;
-    let maxBottom = -Infinity;
-
-    for (const s of screens) {
-        minLeft = Math.min(minLeft, s.left);
-        minTop = Math.min(minTop, s.top);
-        maxRight = Math.max(maxRight, s.left + s.width);
-        maxBottom = Math.max(maxBottom, s.top + s.height);
-    }
-
-    const totalWidth = maxRight - minLeft;
-    const totalHeight = maxBottom - minTop;
-
-    if (totalWidth === 0 || totalHeight === 0) return [];
-
-    // Scale to fit container with padding
-    const padding = 16;
-    const availableWidth = containerWidth - padding * 2;
-    const availableHeight = containerHeight - padding * 2;
-    const scale = Math.min(availableWidth / totalWidth, availableHeight / totalHeight);
-
-    return screens.map((s, index) => ({
-        left: padding + (s.left - minLeft) * scale,
-        top: padding + (s.top - minTop) * scale,
-        width: s.width * scale,
-        height: s.height * scale,
-        index,
-    }));
 }
 
 export default function MultiMonitorTester() {

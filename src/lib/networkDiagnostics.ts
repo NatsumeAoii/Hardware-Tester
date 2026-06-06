@@ -1,4 +1,16 @@
 import { EMPTY_VALUE, NOT_AVAILABLE } from './formatters';
+import {
+    appendCacheBust as _appendCacheBust,
+    createTimeoutError as _createTimeoutError,
+    DEFAULT_FETCH_TIMEOUT_MS as _DEFAULT_FETCH_TIMEOUT_MS,
+    fetchWithTimeout as _fetchWithTimeout,
+} from './fetchUtils';
+
+// Re-export fetch utilities for backward compatibility with existing consumers.
+export const DEFAULT_FETCH_TIMEOUT_MS = _DEFAULT_FETCH_TIMEOUT_MS;
+export const createTimeoutError = _createTimeoutError;
+export const fetchWithTimeout = _fetchWithTimeout;
+export const appendCacheBust = _appendCacheBust;
 
 export interface TestServer {
     id: string;
@@ -41,7 +53,6 @@ type IpApi = {
 
 const FALLBACK_LABEL = NOT_AVAILABLE;
 
-export const DEFAULT_FETCH_TIMEOUT_MS = 5000;
 export const SPEED_FETCH_TIMEOUT_MS = 15000;
 
 export const NETWORK_TEST_SERVERS: TestServer[] = [
@@ -126,56 +137,6 @@ const ipApis: IpApi[] = [
     { url: 'https://ipapi.co/json/', parse: parseIpApiCo },
     { url: 'https://api.ipify.org?format=json', parse: parseIpify },
 ];
-
-const toAbortError = (reason: unknown) =>
-    reason instanceof DOMException
-        ? reason
-        : new DOMException('The operation was cancelled.', 'AbortError');
-
-export const createTimeoutError = (timeoutMs: number) =>
-    new DOMException(`Request timed out after ${timeoutMs}ms.`, 'TimeoutError');
-
-export async function fetchWithTimeout(
-    input: RequestInfo | URL,
-    init: RequestInit = {},
-    timeoutMs = DEFAULT_FETCH_TIMEOUT_MS,
-): Promise<Response> {
-    const sourceSignal = init.signal;
-    if (sourceSignal?.aborted) throw toAbortError(sourceSignal.reason);
-
-    const controller = new AbortController();
-    const safeTimeoutMs = Math.max(1, timeoutMs);
-    const timeoutId = globalThis.setTimeout(() => {
-        controller.abort(createTimeoutError(safeTimeoutMs));
-    }, safeTimeoutMs);
-    const abortFromSource = () => {
-        controller.abort(toAbortError(sourceSignal?.reason));
-    };
-
-    if (sourceSignal) sourceSignal.addEventListener('abort', abortFromSource, { once: true });
-
-    try {
-        return await fetch(input, { ...init, signal: controller.signal });
-    } catch (error) {
-        const reason = controller.signal.reason;
-        if (reason instanceof DOMException) throw reason;
-        throw error;
-    } finally {
-        globalThis.clearTimeout(timeoutId);
-        sourceSignal?.removeEventListener('abort', abortFromSource);
-    }
-}
-
-export function appendCacheBust(rawUrl: string, timestamp = Date.now()): string {
-    try {
-        const parsed = new URL(rawUrl);
-        parsed.searchParams.set('t', String(timestamp));
-        return parsed.toString();
-    } catch {
-        const separator = rawUrl.includes('?') ? '&' : '?';
-        return `${rawUrl}${separator}t=${encodeURIComponent(String(timestamp))}`;
-    }
-}
 
 const parseTraceMap = (text: string) => {
     const values = new Map<string, string>();
@@ -288,13 +249,15 @@ export function trimLatencySamples(samples: number[]): number[] {
 }
 
 export function averageSamples(samples: number[]): number | null {
-    if (samples.length === 0) return null;
-    return samples.reduce((total, sample) => total + sample, 0) / samples.length;
+    const finite = samples.filter(Number.isFinite);
+    if (finite.length === 0) return null;
+    return finite.reduce((total, sample) => total + sample, 0) / finite.length;
 }
 
 export function calculateJitterMs(samples: number[]): number | null {
-    if (samples.length < 2) return null;
-    const diffs = samples.slice(1).map((value, index) => Math.abs(value - samples[index]));
+    const finite = samples.filter(Number.isFinite);
+    if (finite.length < 2) return null;
+    const diffs = finite.slice(1).map((value, index) => Math.abs(value - finite[index]));
     return Math.round(Math.sqrt(diffs.reduce((total, diff) => total + diff * diff, 0) / diffs.length));
 }
 

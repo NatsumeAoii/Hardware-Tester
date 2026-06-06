@@ -80,8 +80,9 @@ export default function GamepadTester() {
             clearTimeoutIfSet(vibrationTimeoutRef.current);
         }
         vibrationTimeoutRef.current = window.setTimeout(() => {
-            setVibrating(false);
             vibrationTimeoutRef.current = null;
+            if (!activeRef.current) return;
+            setVibrating(false);
         }, 600);
     }, [isSupported, selectedPad]);
 

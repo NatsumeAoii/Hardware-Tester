@@ -33,8 +33,8 @@ describe('hardwareCapabilities', () => {
             screen: { height: 800, width: 1200 },
         } as unknown as Parameters<typeof detectHardwareCapabilities>[0];
 
-        const firstGpuStatus = detectHardwareCapabilities(scope).find(capability => capability.id === 'gpu')?.status;
-        const secondGpuStatus = detectHardwareCapabilities(scope).find(capability => capability.id === 'gpu')?.status;
+        const firstGpuStatus = detectHardwareCapabilities(scope).results.find(capability => capability.id === 'gpu')?.status;
+        const secondGpuStatus = detectHardwareCapabilities(scope).results.find(capability => capability.id === 'gpu')?.status;
 
         expect(firstGpuStatus).toBe('unsupported');
         expect(secondGpuStatus).toBe('available');

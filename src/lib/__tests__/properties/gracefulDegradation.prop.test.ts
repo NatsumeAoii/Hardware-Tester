@@ -294,9 +294,9 @@ describe('Property 13: Graceful degradation for unsupported APIs', () => {
                 (scope as Record<string, unknown>)['navigator'] = nav;
 
                 // detectHardwareCapabilities should never throw
-                let results: ReturnType<typeof detectHardwareCapabilities>;
+                let results: ReturnType<typeof detectHardwareCapabilities>['results'];
                 try {
-                    results = detectHardwareCapabilities(scope as never);
+                    results = detectHardwareCapabilities(scope as never).results;
                 } catch {
                     expect.fail('detectHardwareCapabilities threw an exception');
                     return;

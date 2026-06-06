@@ -22,10 +22,11 @@ export default function SoundTester() {
             try { oscillatorRef.current.stop(); } catch { /* already stopped */ }
             oscillatorRef.current = null;
         }
-        if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
-            void closeAudioContext(audioCtxRef.current)
-                .catch(() => { /* audio context cleanup is best-effort */ })
-                .finally(() => { audioCtxRef.current = null; });
+        // Nullify ref synchronously to prevent play() from seeing a closing context
+        const ctx = audioCtxRef.current;
+        audioCtxRef.current = null;
+        if (ctx && ctx.state !== 'closed') {
+            void closeAudioContext(ctx).catch(() => { /* audio context cleanup is best-effort */ });
         }
         gainNodeRef.current = null;
         isPlayingRef.current = false;
@@ -73,8 +74,9 @@ export default function SoundTester() {
             const now = audioCtxRef.current.currentTime;
             gainNodeRef.current.gain.linearRampToValueAtTime(volume, now + 0.05);
             oscillatorRef.current.frequency.linearRampToValueAtTime(frequency, now + 0.05);
+            oscillatorRef.current.type = waveType;
         }
-    }, [volume, frequency]);
+    }, [volume, frequency, waveType]);
 
     useEffect(() => {
         return () => { stop(); };

@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { createDiagnosticState, getDiagnosticMessage, readyDiagnosticState, type DiagnosticState } from '../lib/diagnosticState';
-import { getBluetooth } from '../lib/browserAdapters';
+import { getBluetooth, type BluetoothRemoteGATTServer } from '../lib/browserAdapters';
 import { formatUserSafeError, isAbortError } from '../lib/userSafeErrors';
 
 interface BleDevice {
@@ -29,6 +29,7 @@ export default function BluetoothTester() {
     const [scanning, setScanning] = useState(false);
     const [selectedDevice, setSelectedDevice] = useState<BleDevice | null>(null);
     const [deviceInfo, setDeviceInfo] = useState<Record<string, string>>({});
+    const gattServersRef = useRef<BluetoothRemoteGATTServer[]>([]);
 
     const scanForDevices = useCallback(async () => {
         const bluetooth = getBluetooth();
@@ -58,6 +59,7 @@ export default function BluetoothTester() {
                 setStatus(createDiagnosticState('running', `Connecting to ${newDev.name}...`));
                 const server = await device.gatt?.connect();
                 if (server) {
+                    gattServersRef.current.push(server);
                     newDev.connected = true;
                     try {
                         const svcs = await server.getPrimaryServices();
@@ -107,10 +109,23 @@ export default function BluetoothTester() {
     }, [isSupported]);
 
     const clearDevices = useCallback(() => {
+        for (const server of gattServersRef.current) {
+            try { server.disconnect(); } catch { /* best-effort cleanup */ }
+        }
+        gattServersRef.current = [];
         setDevices([]);
         setSelectedDevice(null);
         setDeviceInfo({});
         setStatus(readyDiagnosticState());
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            for (const server of gattServersRef.current) {
+                try { server.disconnect(); } catch { /* best-effort cleanup */ }
+            }
+            gattServersRef.current = [];
+        };
     }, []);
 
     return (

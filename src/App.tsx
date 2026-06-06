@@ -4,6 +4,7 @@ import { DEFAULT_TESTER, isTesterId, type TesterId } from './lib/testerRegistry'
 import { testerComponents } from './testerComponents';
 import Sidebar from './components/Sidebar';
 import A11yControls from './components/A11yControls';
+import TesterErrorBoundary from './components/TesterErrorBoundary';
 import './styles/App.css';
 
 function App() {
@@ -58,9 +59,11 @@ function App() {
             />
 
             <main id="main-content" className="content" tabIndex={-1}>
-                <Suspense fallback={<div className="tester-loading">Loading...</div>}>
-                    <ActiveComponent key={activeTester} />
-                </Suspense>
+                <TesterErrorBoundary testerId={activeTester}>
+                    <Suspense fallback={<div className="tester-loading">Loading...</div>}>
+                        <ActiveComponent key={activeTester} />
+                    </Suspense>
+                </TesterErrorBoundary>
             </main>
 
             <A11yControls />

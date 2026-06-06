@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useDeviceSpecs } from '../hooks/useDeviceSpecs';
 import { dashboardTesters, navIconPaths } from '../lib/testerRegistry';
 import CompatibilityMatrix from './dashboard/CompatibilityMatrix';
+import '../styles/Dashboard.css';
 
 const specSvgPaths: Record<string, string> = {
     Device: 'M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7l-2 3v1h8v-1l-2-3h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H3V4h18v10z',
@@ -35,6 +36,8 @@ const SpecIcon = ({ label }: { label: string }) => {
     return <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" className="spec-card__svg"><path d={path} /></svg>;
 };
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 export default function Dashboard() {
     const { specs, battery, storage } = useDeviceSpecs();
 
@@ -64,8 +67,6 @@ export default function Dashboard() {
             { label: 'Storage', value: storageVal, note: storage?.label },
         ];
     }, [specs, battery, storage]);
-
-    const year = new Date().getFullYear();
 
     return (
         <section className="dashboard">
@@ -128,66 +129,8 @@ export default function Dashboard() {
             </div>
 
             <footer className="dash-footer">
-                <p>&copy; {year} Hardware Diagnostic Suite. All rights reserved.</p>
+                <p>&copy; {CURRENT_YEAR} Hardware Diagnostic Suite. All rights reserved.</p>
             </footer>
-
-            <style>{`
-        .dashboard { animation: fadeSlideIn 0.4s ease-out; }
-        .dash-hero {
-          padding: 2rem; border-radius: var(--radius);
-          background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(139,92,246,0.08));
-          border: 1px solid var(--border); margin-bottom: 2rem;
-        }
-        .dash-hero__text h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 0.75rem; }
-        .dash-hero__text h1 span { background: var(--accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .dash-hero__tagline { color: var(--text-muted); font-size: var(--text-sm); max-width: 70ch; line-height: 1.7; margin-bottom: 1.5rem; }
-        .dash-hero__actions { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
-        .dash-hero__secondary { background: var(--surface-1); border: 1px solid var(--border); }
-        .dash-section-title {
-          font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;
-          letter-spacing: 0.1em; margin-bottom: 1rem; padding-bottom: 0.5rem;
-          border-bottom: 1px solid var(--border);
-        }
-        .dash-specs { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.5rem; margin-bottom: 2rem; }
-        .spec-card {
-          display: flex; align-items: center; gap: 0.75rem;
-          background: var(--surface-1); border: 1px solid var(--border);
-          border-radius: var(--radius-sm); padding: 0.75rem 1rem; transition: all var(--transition);
-        }
-        .spec-card:hover { border-color: rgba(59,130,246,0.25); }
-        .spec-card__svg { color: var(--text-muted); opacity: 0.5; flex-shrink: 0; }
-        .spec-card__text { display: flex; flex-direction: column; min-width: 0; }
-        .spec-card__label { font-size: 0.625rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
-        .spec-card__value { font-size: var(--text-sm); font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .spec-note-badge { cursor: help; font-size: 0.625rem; color: var(--primary); opacity: 0.7; margin-left: 2px; font-style: normal; }
-        .dash-features { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.6rem; margin-bottom: 2rem; }
-        .dash-feature {
-          background: linear-gradient(135deg, var(--surface-2), var(--surface-1));
-          border: 1px solid var(--border); border-radius: var(--radius);
-          padding: 1rem; transition: all var(--transition); cursor: pointer;
-          position: relative; overflow: hidden; color: var(--text); text-decoration: none;
-        }
-        .dash-feature::before {
-          content: ''; position: absolute; inset: 0;
-          background: linear-gradient(135deg, rgba(59,130,246,0.04), transparent);
-          pointer-events: none;
-        }
-        .dash-feature:hover, .dash-feature:focus-visible { border-color: rgba(59,130,246,0.3); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
-        .dash-feature__svg { color: var(--primary); opacity: 0.7; margin-bottom: 0.35rem; display: block; }
-        .dash-feature h3 { font-size: var(--text-sm); font-weight: 600; margin-bottom: 0.15rem; }
-        .dash-feature p { font-size: 0.6875rem; color: var(--text-muted); line-height: 1.4; }
-        .dash-info-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .dash-info-card {
-          background: linear-gradient(135deg, var(--surface-2), var(--surface-1));
-          border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem;
-        }
-        .dash-info-card h3 { font-size: var(--text-sm); font-weight: 600; margin-bottom: 0.5rem; color: var(--text); display: flex; align-items: center; gap: 0.5rem; }
-        .info-card__svg { color: var(--text-muted); opacity: 0.5; flex-shrink: 0; }
-        .dash-info-card p { font-size: var(--text-xs); color: var(--text-muted); line-height: 1.6; }
-        .dash-footer { text-align: center; color: var(--text-muted); font-size: var(--text-xs); opacity: 0.6; padding-top: 1rem; border-top: 1px solid var(--border); }
-        .dash-footer p + p { margin-top: 0.25rem; }
-        @media (max-width: 768px) { .dash-hero__text h1 { font-size: 1.75rem; } }
-      `}</style>
         </section>
     );
 }

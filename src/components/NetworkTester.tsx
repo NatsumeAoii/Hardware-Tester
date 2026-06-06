@@ -182,7 +182,9 @@ export default function NetworkTester() {
                 }));
             }
         } finally {
-            stopTest();
+            if (isTestingRef.current) {
+                stopTest();
+            }
         }
     }, [loadConnectionDetails, server, testSize.bytes, resetResults, stopTest, updateProgress]);
 

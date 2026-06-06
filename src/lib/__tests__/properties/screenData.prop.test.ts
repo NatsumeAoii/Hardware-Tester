@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import * as fc from 'fast-check';
-import type { ScreenInfo } from '../../../components/MultiMonitorTester';
+import type { ScreenInfo } from '../../displayLayout';
 
 /**
  * Property 2: Multi-monitor screen data completeness

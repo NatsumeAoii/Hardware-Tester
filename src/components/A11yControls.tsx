@@ -33,7 +33,7 @@ export default function A11yControls() {
     const themeModeLabel = themeMode === 'system' ? `System (${effectiveTheme})` : themeMode;
 
     return (
-        <div className="a11y-controls" aria-label="Display preferences">
+        <section className="a11y-controls" role="region" aria-label="Display preferences">
             <div className="theme-mode-group" role="group" aria-label={`Theme mode: ${themeModeLabel}`}>
                 {themeOptions.map(option => (
                     <button
@@ -71,6 +71,6 @@ export default function A11yControls() {
             >
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z" /></svg>
             </button>
-        </div>
+        </section>
     );
 }

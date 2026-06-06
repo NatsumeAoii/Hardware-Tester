@@ -1,9 +1,15 @@
 import { useMemo } from 'react';
 import { useHardwareCapabilities } from '../hooks/useHardwareCapabilities';
-import { appVersionLabel } from '../lib/changelogVersion';
+import VersionPanel from './VersionPanel';
 import type { CapabilityStatus } from '../lib/hardwareCapabilities';
 import { navIconPaths, testerGroups, testers, type TesterId } from '../lib/testerRegistry';
 import '../styles/Sidebar.css';
+
+// Static — computed once at module level since testerGroups and testers never change.
+const groupedNav = testerGroups.map(group => ({
+    ...group,
+    items: testers.filter(tester => tester.group === group.key),
+}));
 
 const navStatusLabels: Record<CapabilityStatus, string> = {
     available: 'ready',
@@ -38,11 +44,6 @@ interface SidebarProps {
 
 export default function Sidebar({ activeTester, sidebarOpen, isMobile, onNavClick, onClose, onOpen }: SidebarProps) {
     const { capabilities } = useHardwareCapabilities();
-
-    const groupedNav = useMemo(() => testerGroups.map(group => ({
-        ...group,
-        items: testers.filter(tester => tester.group === group.key),
-    })), []);
 
     const capabilityByTesterId = useMemo(() => new Map(
         capabilities
@@ -122,7 +123,7 @@ export default function Sidebar({ activeTester, sidebarOpen, isMobile, onNavClic
 
                 <footer className="sidebar__footer">
                     <p>&copy; {currentYear} Diagnostic Suite</p>
-                    <div className="version-info">{appVersionLabel}</div>
+                    <VersionPanel />
                 </footer>
             </aside>
         </>

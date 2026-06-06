@@ -50,7 +50,7 @@ Recommended maintainer process:
 ## Security Considerations For Deployers
 
 - Serve the app over HTTPS. Several browser hardware APIs require secure contexts.
-- Replace `[FILL IN: PUBLIC_CANONICAL_URL]` in `index.html` before public indexing.
+- Keep the canonical and Open Graph URLs in `index.html` accurate for the deployment target.
 - Do not add analytics, telemetry, persistent remote storage, or new external endpoints without documenting the data flow and privacy impact.
 - Keep dependency audit in CI: `npm audit --audit-level=moderate`.
 - Do not commit `.env` files, captured reports, tokens, private keys, or device/user data.

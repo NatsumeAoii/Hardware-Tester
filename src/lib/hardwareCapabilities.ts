@@ -387,16 +387,16 @@ export const hardwareCapabilities: HardwareCapabilityDescriptor[] = [
     },
 ];
 
-export const detectHardwareCapabilities = (scope?: HardwareGlobal): HardwareCapabilityResult[] => {
+export const detectHardwareCapabilities = (scope?: HardwareGlobal): { results: HardwareCapabilityResult[]; profile: DeviceProfile } => {
     const runtimeScope = getScope(scope);
     const navigatorRef = getNavigator(runtimeScope);
     const profile = getDeviceProfile(runtimeScope);
 
-    return hardwareCapabilities.map(capability => {
+    const results = hardwareCapabilities.map(capability => {
         if (capability.secureContextRequired && !profile.secureContext) {
             return {
                 ...capability,
-                status: 'blocked',
+                status: 'blocked' as const,
                 reason: 'Requires HTTPS or localhost before the browser exposes this hardware API.',
             };
         }
@@ -404,7 +404,7 @@ export const detectHardwareCapabilities = (scope?: HardwareGlobal): HardwareCapa
         if (!getCapabilitySupport(capability, runtimeScope, navigatorRef, profile)) {
             return {
                 ...capability,
-                status: 'unsupported',
+                status: 'unsupported' as const,
                 reason: capability.fallback,
             };
         }
@@ -412,7 +412,7 @@ export const detectHardwareCapabilities = (scope?: HardwareGlobal): HardwareCapa
         if (getCapabilityPartial(capability, runtimeScope, navigatorRef, profile)) {
             return {
                 ...capability,
-                status: 'partial',
+                status: 'partial' as const,
                 reason: capability.fallback,
             };
         }
@@ -420,17 +420,19 @@ export const detectHardwareCapabilities = (scope?: HardwareGlobal): HardwareCapa
         if (capability.permissionRequired) {
             return {
                 ...capability,
-                status: 'permission',
+                status: 'permission' as const,
                 reason: 'Available after browser permission is granted.',
             };
         }
 
         return {
             ...capability,
-            status: 'available',
+            status: 'available' as const,
             reason: 'Ready in this browser profile.',
         };
     });
+
+    return { results, profile };
 };
 
 export const getCompatibilityScore = (results: HardwareCapabilityResult[]) => {

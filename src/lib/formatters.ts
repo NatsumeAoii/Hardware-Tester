@@ -1,8 +1,19 @@
 export const EMPTY_VALUE = '—';
 export const NOT_AVAILABLE = 'N/A';
 
+const intlNumberFormatCache = new Map<string, Intl.NumberFormat>();
+
+function getNumberFormatter(locale: string): Intl.NumberFormat {
+    let formatter = intlNumberFormatCache.get(locale);
+    if (!formatter) {
+        formatter = new Intl.NumberFormat(locale);
+        intlNumberFormatCache.set(locale, formatter);
+    }
+    return formatter;
+}
+
 export function formatInteger(value: number, locale = 'en-US'): string {
-    return new Intl.NumberFormat(locale).format(value);
+    return getNumberFormatter(locale).format(value);
 }
 
 export function formatBytes(bytes: number): string {

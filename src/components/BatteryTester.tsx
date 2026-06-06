@@ -44,7 +44,8 @@ export default function BatteryTester() {
         };
 
         const handleBatteryChange = () => {
-            if (batteryRef) updateBattery(batteryRef);
+            if (cancelled || !batteryRef) return;
+            updateBattery(batteryRef);
         };
 
         const init = async () => {
@@ -65,7 +66,7 @@ export default function BatteryTester() {
         init();
 
         const interval = window.setInterval(() => {
-            if (batteryRef) updateBattery(batteryRef);
+            if (!cancelled && batteryRef) updateBattery(batteryRef);
         }, 30000);
 
         return () => {

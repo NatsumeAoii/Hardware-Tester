@@ -42,9 +42,13 @@ assert.match(app, /from '\.\/lib\/testerRegistry'/, 'App must consume centralize
 assert.match(app, /from '\.\/lib\/routeUtils'/, 'App must consume centralized hash route logic');
 
 const sidebar = read('src/components/Sidebar.tsx');
-assert.match(sidebar, /appVersionLabel/, 'Sidebar must render the visible version from changelog metadata');
+assert.match(sidebar, /VersionPanel/, 'Sidebar must render the version panel from changelog metadata');
 assert.match(sidebar, /repositoryUrl/, 'Sidebar must include the repository link');
 assert.match(sidebar, /bugReportUrl/, 'Sidebar must include the bug report link');
+
+const versionPanel = read('src/components/VersionPanel.tsx');
+assert.match(versionPanel, /appVersionLabel/, 'VersionPanel must display the latest version from changelog');
+assert.match(versionPanel, /changelogEntries/, 'VersionPanel must consume parsed changelog entries');
 assert.match(sidebar, /https:\/\/github\.com\/NatsumeAoii\/Hardware-Tester/, 'Sidebar must use the current repository URL');
 assert.doesNotMatch(sidebar, /github\.com\/wardana\/hardware-diagnostic-suite/, 'Sidebar must not link to the old repository');
 assert.match(sidebar, /sidebar__support/, 'Sidebar must place project links near the navigation items');

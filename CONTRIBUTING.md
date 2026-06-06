@@ -4,7 +4,7 @@ Thanks for improving Hardware Diagnostic Suite. This project is a browser-based 
 
 ## Development Setup
 
-Use Node.js 22 or newer.
+Use Node.js 24 or newer.
 
 ```sh
 npm ci

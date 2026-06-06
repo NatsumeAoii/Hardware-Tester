@@ -78,6 +78,7 @@ export default function ScreenTester() {
                     const avg = times.reduce((a, b) => a + b, 0) / times.length;
                     const rate = Math.round(1000 / avg);
                     setScreenInfo(prev => prev.map(p => p.title === 'Refresh Rate' ? { ...p, value: `${rate} Hz` } : p));
+                    cancelled = true;
                     return;
                 }
             }

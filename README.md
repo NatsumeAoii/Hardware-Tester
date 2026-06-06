@@ -21,8 +21,8 @@ Vite is configured for port `3000` in `vite.config.ts` and may report another po
 
 ## Requirements
 
-- Node.js 22 or newer
-- npm 10 or newer
+- Node.js 24 or newer
+- npm 11 or newer
 - A modern browser
 - No `.env` file is required by the current codebase
 
@@ -158,7 +158,6 @@ Current configuration is code-based:
 - `tsconfig.json` enables strict TypeScript checks and includes `src`.
 - `index.html` contains app metadata, structured data, and the manifest link.
 - `public/site.webmanifest` defines install/display metadata.
-- `[FILL IN: PUBLIC_CANONICAL_URL]` in `index.html` must be replaced with the final HTTPS deployment URL before public indexing.
 
 There are no documented `.env` files or required runtime configuration values in the current repository.
 
@@ -198,7 +197,7 @@ The workflow:
 - Runs dependency audit, unit tests, smoke checks, type checking, Playwright browser route tests, and production build.
 - Uploads `dist/` to GitHub Pages.
 
-Before publishing a public build, replace `[FILL IN: PUBLIC_CANONICAL_URL]` in `index.html` with the final canonical URL for the deployed site.
+The canonical and Open Graph URLs in `index.html` point to `https://natsumeaoii.github.io/Hardware-Tester/`.
 
 ## Q&A
 
@@ -232,9 +231,9 @@ Native packages such as Lightning CSS can leave `.node` files locked while a dev
 
 </details>
 
-<details><summary><strong>Why is `[FILL IN: PUBLIC_CANONICAL_URL]` in `index.html`?</strong></summary>
+<details><summary><strong>Where is the canonical URL configured?</strong></summary>
 
-The repo contains public SEO/social metadata, but the final deployed URL is not inferable from the code alone. Replace the placeholder with the production HTTPS URL before publishing an indexed build.
+The canonical and Open Graph URLs are set in `index.html` and point to the GitHub Pages deployment: `https://natsumeaoii.github.io/Hardware-Tester/`. Update these if the deployment target changes.
 
 </details>
 

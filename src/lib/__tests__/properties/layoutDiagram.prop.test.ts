@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { computeLayoutRects, ScreenInfo } from '../../../components/MultiMonitorTester';
+import { computeLayoutRects, ScreenInfo } from '../../displayLayout';
 
 /**
  * Property 3: Screen layout diagram proportional positioning

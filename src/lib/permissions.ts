@@ -1,6 +1,22 @@
 export type PermissionProbeState = PermissionState | 'unsupported' | 'unknown';
 export type MotionPermissionResult = 'granted' | 'denied' | 'prompt';
 
+/**
+ * Extended permission names that include browser-specific names not in the TS lib.
+ * Centralizes the PermissionName cast so components don't need `as PermissionName`.
+ */
+export type HardwarePermissionName =
+    | PermissionName
+    | 'camera'
+    | 'microphone'
+    | 'clipboard-read'
+    | 'clipboard-write'
+    | 'geolocation'
+    | 'accelerometer'
+    | 'gyroscope'
+    | 'magnetometer'
+    | 'ambient-light-sensor';
+
 export interface PermissionCapableSensorEvent {
     requestPermission?: () => Promise<MotionPermissionResult>;
 }
@@ -11,13 +27,13 @@ type WindowWithMotionPermissions = Window & {
 };
 
 export async function queryPermissionState(
-    name: PermissionName,
+    name: HardwarePermissionName,
     navigatorRef: Navigator = navigator,
 ): Promise<PermissionProbeState> {
     if (typeof navigatorRef.permissions?.query !== 'function') return 'unsupported';
 
     try {
-        const status = await navigatorRef.permissions.query({ name });
+        const status = await navigatorRef.permissions.query({ name: name as PermissionName });
         return status.state;
     } catch {
         return 'unknown';
@@ -25,7 +41,7 @@ export async function queryPermissionState(
 }
 
 export async function throwIfPermissionDenied(
-    name: PermissionName,
+    name: HardwarePermissionName,
     featureLabel: string,
     navigatorRef: Navigator = navigator,
 ): Promise<PermissionProbeState> {

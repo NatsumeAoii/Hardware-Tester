@@ -32,12 +32,20 @@ export default function BurnInFixer() {
         setIsActive(true);
         setElapsed(0);
 
+        // Resize the noise canvas to cover the screen for effective pixel stimulation
+        const canvas = canvasRef.current;
+        if (canvas) {
+            const displayWidth = Math.min(window.screen.width, 1920);
+            const displayHeight = Math.min(window.screen.height, 1080);
+            canvas.width = displayWidth;
+            canvas.height = displayHeight;
+        }
+
         let frameCount = 0;
         let lastSwitch = 0;
         let colorIdx = 0;
         const startTime = performance.now();
 
-        const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
 
         const render = (now: number) => {

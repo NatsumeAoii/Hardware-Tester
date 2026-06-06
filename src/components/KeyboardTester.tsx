@@ -16,6 +16,9 @@ const shouldPreventDefault = (event: KeyboardEvent) => {
     return browserManagedKeys.has(event.key);
 };
 
+/** Pre-computed once at module level since the layout data never changes. */
+const TOTAL_KEYS = keyboardLayout.reduce((sum, row) => sum + row.keys.filter(k => k.code).length, 0);
+
 export default function KeyboardTester() {
     const [layout, setLayout] = useState('full');
     const [keyValue, setKeyValue] = useState('—');
@@ -31,13 +34,24 @@ export default function KeyboardTester() {
             setKeyValue(e.key === ' ' ? 'Space' : e.key);
             setKeyCode(code);
             setKeyLocation(getLocationName(e.location));
-            setPressedKeys(prev => new Set(prev).add(code));
-            setActivatedKeys(prev => new Set(prev).add(code));
+            setPressedKeys(prev => {
+                if (prev.has(code)) return prev;
+                const next = new Set(prev);
+                next.add(code);
+                return next;
+            });
+            setActivatedKeys(prev => {
+                if (prev.has(code)) return prev;
+                const next = new Set(prev);
+                next.add(code);
+                return next;
+            });
         };
 
         const handleKeyUp = (e: KeyboardEvent) => {
             if (shouldPreventDefault(e)) e.preventDefault();
             setPressedKeys(prev => {
+                if (!prev.has(e.code)) return prev;
                 const next = new Set(prev);
                 next.delete(e.code);
                 return next;
@@ -52,7 +66,7 @@ export default function KeyboardTester() {
         };
     }, []);
 
-    const totalKeys = keyboardLayout.reduce((sum, row) => sum + row.keys.filter(k => k.code).length, 0);
+    const totalKeys = TOTAL_KEYS;
     const testedCount = activatedKeys.size;
 
     const reset = () => {

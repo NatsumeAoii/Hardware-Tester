@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { formatBytes } from '../lib/formatters';
+import { computePercentage } from '../lib/displayLayout';
 import { getUserSafeError, isAbortError } from '../lib/userSafeErrors';
 
 interface StorageDisplayState {
@@ -7,11 +8,6 @@ interface StorageDisplayState {
     usage: number;
     loading: boolean;
     error: string | null;
-}
-
-function computePercentage(usage: number, quota: number): number {
-    if (quota === 0) return 0;
-    return Math.min(100, Math.max(0, Math.round((usage / quota) * 100)));
 }
 
 export default function UsbStorageTester() {
@@ -104,5 +100,3 @@ export default function UsbStorageTester() {
         </section>
     );
 }
-
-export { computePercentage };

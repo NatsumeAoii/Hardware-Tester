@@ -11,6 +11,7 @@ import {
     type GpuInfo,
 } from '../lib/graphicsDiagnostics';
 import { cancelAnimationFrameIfSet } from '../lib/lifecycle';
+import { formatUserSafeError } from '../lib/userSafeErrors';
 
 export default function GpuTester() {
     const [gpuInfo, setGpuInfo] = useState<GpuInfo | null>(null);
@@ -26,6 +27,7 @@ export default function GpuTester() {
     const animRef = useRef<number>(0);
     const activeRef = useRef(false);
     const cleanupStressRef = useRef<(() => void) | null>(null);
+    const contextListenersCleanupRef = useRef<(() => void) | null>(null);
 
     useEffect(() => {
         const info = getWebGLInfo();
@@ -94,6 +96,30 @@ export default function GpuTester() {
             gl.deleteProgram(prog);
         };
 
+        const handleContextLost = (event: Event) => {
+            event.preventDefault();
+            activeRef.current = false;
+            cancelAnimationFrameIfSet(animRef.current);
+            setStressActive(false);
+            setStressFps(EMPTY_VALUE);
+            setStressError(formatUserSafeError(
+                new Error('WebGL context lost'),
+                { stableCode: 'GPU_CONTEXT_LOST', message: 'The GPU context was lost during the stress test.', detail: 'The browser or driver reset the graphics context. Try restarting the test.' }
+            ));
+        };
+
+        const handleContextRestored = (event: Event) => {
+            event.preventDefault();
+        };
+
+        canvas.addEventListener('webglcontextlost', handleContextLost);
+        canvas.addEventListener('webglcontextrestored', handleContextRestored);
+
+        contextListenersCleanupRef.current = () => {
+            canvas.removeEventListener('webglcontextlost', handleContextLost);
+            canvas.removeEventListener('webglcontextrestored', handleContextRestored);
+        };
+
         activeRef.current = true;
         setStressActive(true);
         let frames = 0;
@@ -131,6 +157,8 @@ export default function GpuTester() {
         cancelAnimationFrameIfSet(animRef.current);
         cleanupStressRef.current?.();
         cleanupStressRef.current = null;
+        contextListenersCleanupRef.current?.();
+        contextListenersCleanupRef.current = null;
         setStressActive(false);
         setStressFps(EMPTY_VALUE);
         setStressTime(0);
@@ -143,6 +171,8 @@ export default function GpuTester() {
             cancelAnimationFrameIfSet(animRef.current);
             cleanupStressRef.current?.();
             cleanupStressRef.current = null;
+            contextListenersCleanupRef.current?.();
+            contextListenersCleanupRef.current = null;
         };
     }, []);
 
