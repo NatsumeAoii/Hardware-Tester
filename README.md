@@ -71,18 +71,17 @@ On a fresh machine, install the Chromium browser used by Playwright once:
 npx playwright install chromium
 ```
 
-On a Playwright browser cache miss, the GitHub Actions workflow installs Chromium with system dependencies by running `npx playwright install --with-deps chromium`.
+The GitHub Pages deploy workflow does not install Playwright browsers or run browser route tests. Run `npm run test:e2e` locally when browser regression coverage is needed.
 
 ## Verification
 
-Before opening a pull request or publishing a build, run the same checks used by CI:
+Before publishing a build, run the same checks used by CI:
 
 ```sh
 npm audit --audit-level=moderate
 npm test
 npm run test:smoke
 npm run check
-npm run test:e2e
 npm run build
 ```
 
@@ -194,7 +193,7 @@ The repository includes a GitHub Pages workflow at `.github/workflows/deploy.yml
 The workflow:
 
 - Installs dependencies with `npm ci`.
-- Runs dependency audit, unit tests, smoke checks, type checking, Playwright browser route tests, and production build.
+- Runs dependency audit, unit tests, smoke checks, type checking, and production build.
 - Uploads `dist/` to GitHub Pages.
 
 The canonical and Open Graph URLs in `index.html` point to `https://natsumeaoii.github.io/Hardware-Tester/`.

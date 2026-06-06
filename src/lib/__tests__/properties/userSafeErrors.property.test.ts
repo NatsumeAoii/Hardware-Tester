@@ -65,6 +65,12 @@ describe('Property 3: Error formatting always produces structured output with st
             { numRuns: 100 },
         );
     });
+
+    it('falls back safely for names inherited from Object.prototype', () => {
+        const result = getUserSafeError({ name: 'constructor', message: '' });
+
+        expect(result.stableCode).toBe('UNKNOWN_BROWSER_ERROR');
+    });
 });
 
 /**

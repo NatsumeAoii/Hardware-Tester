@@ -341,9 +341,9 @@ const workflow = read('.github/workflows/deploy.yml');
 assert.match(workflow, /node-version:\s*24/, 'CI must use a Node version compatible with the lock file');
 assert.match(workflow, /npm test/, 'CI must run unit tests');
 assert.match(workflow, /npm run test:smoke/, 'CI must run frontend smoke tests');
-assert.match(workflow, /playwright install --with-deps chromium/, 'CI must install the Chromium browser for e2e tests');
-assert.doesNotMatch(workflow, /playwright install-deps chromium/, 'CI must not run a separate Playwright system dependency install');
-assert.match(workflow, /npm run test:e2e/, 'CI must run browser route tests');
+assert.doesNotMatch(workflow, /playwright install/, 'Deploy CI must not install Playwright browsers');
+assert.doesNotMatch(workflow, /ms-playwright/, 'Deploy CI must not cache Playwright browsers');
+assert.doesNotMatch(workflow, /npm run test:e2e/, 'Deploy CI must not run browser route tests');
 assert.match(workflow, /npm audit --audit-level=moderate/, 'CI must run dependency audit');
 
 const playwrightConfig = read('playwright.config.ts');

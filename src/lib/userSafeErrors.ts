@@ -64,8 +64,12 @@ const toErrorName = (error: unknown) => {
     return '';
 };
 
+const getMappedError = (name: string) => {
+    return Object.prototype.hasOwnProperty.call(errorMessages, name) ? errorMessages[name] : undefined;
+};
+
 export function getUserSafeError(error: unknown, fallback: Partial<UserSafeError> = {}): UserSafeError {
-    const mapped = errorMessages[toErrorName(error)] ?? unknownError;
+    const mapped = getMappedError(toErrorName(error)) ?? unknownError;
     return {
         stableCode: fallback.stableCode ?? mapped.stableCode,
         message: fallback.message ?? mapped.message,
